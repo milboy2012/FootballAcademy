@@ -11,18 +11,18 @@ namespace Domain.Entity
     public class User : BaseEntity
     {
         // Identity-данные
-        public Email Email { get; private set; }
-        public string PasswordHash { get; private set; } = string.Empty;
-        public PhoneNumber? Phone { get; private set; }
-        public FullName FullName { get; private set; }
+        public Email Email { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
+        public PhoneNumber? Phone { get; set; }
+        public FullName FullName { get; set; }
 
         // Статус
-        public bool IsEmailConfirmed { get; private set; }
-        public bool IsPhoneConfirmed { get; private set; }
-        public bool IsActive { get; private set; }
-        public DateTime? LastLoginAt { get; private set; }
-        public string? RefreshToken { get; private set; }
-        public DateTime? RefreshTokenExpiry { get; private set; }
+        public bool IsEmailConfirmed { get; set; }
+        public bool IsPhoneConfirmed { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime? LastLoginAt { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
 
         // Роль 
         public UserRole Role { get; protected set; }

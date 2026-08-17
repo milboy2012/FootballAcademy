@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using Domain.Model;
 using Domain.ValueObjects;
 using System;
 using System.Collections.Generic;

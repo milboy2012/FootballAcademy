@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using Domain.Model;
 using Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -198,6 +199,7 @@ namespace Domain.Entity
         {
             var attendance = new Attendance(
                 Id,
+                Id, //-----------нужно будет передать идентификатор тренировки
                 DateOnly.FromDateTime(DateTime.UtcNow),
                 status,
                 comment
@@ -244,7 +246,7 @@ namespace Domain.Entity
             if (coach == null) throw new ArgumentNullException(nameof(coach));
 
             if (GroupId != null && GroupId != group.Id)
-                throw new DomainException("Игрок уже в другой группе. Сначала переведите его");
+                throw new Exception("Игрок уже в другой группе. Сначала переведите его");
 
             GroupId = group.Id;
             Group = group;
@@ -295,6 +297,11 @@ namespace Domain.Entity
                 <= 75 => "Профи",
                 _ => "Мастер"
             };
+        }
+
+        internal int GetAge()
+        {
+            return Age;
         }
     }
 }
