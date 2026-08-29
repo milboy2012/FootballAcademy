@@ -16,7 +16,7 @@ namespace Domain.Entity
         public DateOnly Date { get; private set; }
         public string? CoachComment { get; private set; }
 
-        // Связи
+        // Внешние ключи
         public Guid PlayerId { get; private set; }
         public Player Player { get; private set; } = null!;
 

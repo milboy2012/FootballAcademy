@@ -23,8 +23,8 @@ namespace Domain.Entity
         public int RequiredValue { get; private set; } 
         public bool IsActive { get; private set; }
 
-        // Связи
-        public ICollection<PlayerAchievement> Players { get; private set; } = new List<PlayerAchievement>();
+        // Внешние ключи
+        public ICollection<PlayerAchievement> PlayersAchivement { get; private set; } = new List<PlayerAchievement>();
 
         // EF Core
         private Achievement() { } 

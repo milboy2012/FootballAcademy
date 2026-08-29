@@ -9,13 +9,13 @@ namespace Domain.Entity
     // Связь игрока с достижением (когда разблокировано)
     public class PlayerAchievement : BaseEntity
     {
+        public DateTime UnlockedAt { get; private set; }
+
+        //Внешние ключи
         public Guid PlayerId { get; private set; }
         public Player Player { get; private set; } = null!;
-
         public Guid AchievementId { get; private set; }
         public Achievement Achievement { get; private set; } = null!;
-
-        public DateTime UnlockedAt { get; private set; }
 
         // EF Core
         private PlayerAchievement() { } 

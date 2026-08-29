@@ -16,8 +16,15 @@ namespace Domain.Entity
         public string? Address { get; private set; }
         public string? WorkPlace { get; private set; }
 
+        // Внешние ключи
         // Связь с игроками (один родитель может иметь несколько детей в академии)
         public ICollection<Player> Children { get; private set; } = new List<Player>();
+        public ICollection<Payment> Payments { get; private set; } = new List<Payment>();
+        public Guid SubscriptionId { get; private set; }
+        public Subscription Subscription { get; private set; }
+        public Guid? UserId { get; private set; }
+        public User User { get; private set; }
+
 
         // EF Core
         private Parent() { }

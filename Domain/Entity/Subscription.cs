@@ -17,16 +17,20 @@ namespace Domain.Entity
         public DateTime StartDate { get; private set; }
         public DateTime? EndDate { get; private set; }
         // За сколько дней до окончания продлевать
-        public int AutoRenewDays { get; private set; } 
+        public int AutoRenewDays { get; private set; }
 
-        // Связи
-        public Guid ParentId { get; private set; }
-        public Parent Parent { get; private set; } = null!;
-
+        // Внешние ключи
         public Guid PlayerId { get; private set; }
         public Player Player { get; private set; } = null!;
 
         public ICollection<Payment> Payments { get; private set; } = new List<Payment>();
+
+        public Guid ParentId { get; private set; }
+        public Parent Parent { get; private set; } = null!;
+
+        
+
+        
 
         // EF Core
         private Subscription() { }

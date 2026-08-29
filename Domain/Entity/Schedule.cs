@@ -18,12 +18,18 @@ namespace Domain.Entity
         public bool IsActive { get; private set; }
         public string? Notes { get; private set; }
 
-        // Связи
+        // Внешние ключи
+        public Guid TrainingSessionId { get;  set; }
+        public TrainingSession TrainigSession { get; private set; }
+
         public Guid GroupId { get; private set; }
         public Group Group { get; private set; } = null!;
 
         public Guid CoachId { get; private set; }
         public Coach Coach { get; private set; } = null!;
+        
+
+
 
         // EF Core
         private Schedule() { } 

@@ -24,9 +24,14 @@ namespace Domain.Entity
         public double AverageRating { get; private set; }
         public int TotalReviews { get; private set; }
 
-        // Связи
-        public ICollection<Group> Groups { get; private set; } = new List<Group>();
+        // Внешний ключи        
+        public ICollection<TrainingSession> TrainingSessions{ get; private set; }
         public ICollection<Player> Players { get; private set; } = new List<Player>();
+        public ICollection<Group> Groups { get; private set; } = new List<Group>();
+        public Guid UserId { get; private set; }
+        public User User { get; private set; }
+        public ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
+
 
         // EF Core
         private Coach() { }

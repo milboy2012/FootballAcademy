@@ -20,22 +20,26 @@ namespace Domain.Entity
         // Заметки тренера о тренировке
         public string? CoachNotes { get; private set; }
 
-        // Связи
+        // Внешние ключи
+        public Guid? ScoreId { get; set; }
+        public Score Score { get; private set; }        
+
+        public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
+
+        public Guid? ScheduleId { get; set; } // Ссылка на расписание (если есть)
+        public Schedule? Schedule { get; private set; }
+
         public Guid GroupId { get; private set; }
         public Group Group { get; private set; } = null!;
 
         public Guid CoachId { get; private set; }
         public Coach Coach { get; private set; } = null!;
-
-        public Guid? ScheduleId { get; private set; } // Ссылка на расписание (если есть)
-        public Schedule? Schedule { get; private set; }
-
-        public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
+        
 
         // EF Core
         private TrainingSession() { }
 
-        public TrainingSession(DateOnly date,TimeOnly startTime,TimeOnly endTime,Group group,Coach coach,string? location = null,Guid? scheduleId = null)
+        public TrainingSession(DateOnly date,TimeOnly startTime,TimeOnly endTime,Group group, Coach coach, string? location = null,Guid? scheduleId = null)
         {
             if (startTime >= endTime)
                 throw new ArgumentException("Время начала должно быть раньше времени окончания");
@@ -47,8 +51,8 @@ namespace Domain.Entity
             EndTime = endTime;
             GroupId = group.Id;
             Group = group;
-            CoachId = coach.Id;
             Coach = coach;
+            
             Location = location;
             ScheduleId = scheduleId;
             IsCompleted = false;

@@ -24,7 +24,7 @@ namespace Domain.Entity
         // Ссылка на чек
         public string? ReceiptUrl { get; private set; } 
 
-        // Связи
+        // Внешние ключи
         public Guid ParentId { get; private set; }
         public Parent Parent { get; private set; } = null!;
 

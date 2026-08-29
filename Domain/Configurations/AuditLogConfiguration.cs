@@ -9,21 +9,20 @@ using System.Threading.Tasks;
 
 namespace Domain.Configurations
 {
-    public class AchievementConfiguration : IEntityTypeConfiguration<Achievement>
+    public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
     {
-        public void Configure(EntityTypeBuilder<Achievement> builder)
+        public void Configure(EntityTypeBuilder<AuditLog> builder)
         {
             //таблица
-            builder.ToTable("Achievement");
+            builder.ToTable("AuditLog");
 
             // Первичный ключ
             builder.HasKey(u => u.Id);
 
             //свойства
 
-            //связи         
-                
-
+            //связи
+            
 
             //индексы
         }

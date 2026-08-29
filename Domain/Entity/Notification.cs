@@ -18,7 +18,7 @@ namespace Domain.Entity
         public string? LinkUrl { get; private set; } 
         public DateTime SentAt { get; private set; }
 
-        // Связи
+        // Внешние ключи
         public Guid UserId { get; private set; }
         public User User { get; private set; } = null!;
 

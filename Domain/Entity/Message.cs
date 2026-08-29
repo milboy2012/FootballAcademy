@@ -14,13 +14,14 @@ namespace Domain.Entity
         public bool IsRead { get; private set; }
         public DateTime? ReadAt { get; private set; }
         // Ссылка на файл
-        public string? AttachmentUrl { get; private set; } 
+        public string? AttachmentUrl { get; private set; }
 
-        // Связи
+        // Внешние ключи
+        // Чат идет в рамках игрока
         public Guid SenderId { get; private set; }
         public User Sender { get; private set; } = null!;
 
-        // Чат идет в рамках игрока
+        
         public Guid PlayerId { get; private set; } 
         public Player Player { get; private set; } = null!;
 

@@ -27,9 +27,24 @@ namespace Domain.Entity
         // Роль 
         public UserRole Role { get; protected set; }
 
-        // Навигационные свойства
-        //public ICollection<Notification> Notifications { get; private set; } = new List<Notification>();
-        //public ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
+        // Внешние ссылки
+        public ICollection<Message> Messages { get; private set; } = new List<Message>();
+
+        public Guid? SenderId { get; private set; }
+        public Player? Sender{ get; private set; }
+
+        public Guid? CoachId { get; private set; }
+        public Coach? Coach { get; private set; }
+
+        public ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
+        public ICollection<Notification> Notifications { get; private set; } = new List<Notification>();
+
+        public Guid? ParentId { get; private set; }
+        public Parent? Parent{ get; private set; }
+
+        public Guid? PlayerId { get; private set; }
+        public Player Player{ get; set; }
+
 
         // EF Core
         protected User() { }

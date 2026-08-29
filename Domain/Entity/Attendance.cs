@@ -15,12 +15,12 @@ namespace Domain.Entity
         // Причина пропуска и т.д.
         public string? Comment { get; private set; } 
 
-        // Связи
+        // Внешние ключи
         public Guid PlayerId { get; private set; }
         public Player Player { get; private set; } = null!;
 
         public Guid TrainingSessionId { get; private set; }
-        public TrainingSession TrainingSession { get; private set; } = null!;
+        public TrainingSession TrainingSession { get; private set; }
 
         //  EF Core
         private Attendance() { }

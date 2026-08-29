@@ -34,12 +34,13 @@ namespace Domain.Entity
         // Длительность тренировки (мин)
         public int DurationMinutes { get; private set; }
 
-        // Связи
+        // внешние ключи
+        public ICollection<TrainingSession> TrainingSessions { get; private set; } = new List<TrainingSession>();
+        public Guid? PlayerId { get; private set; }
+        public Player Player { get; private set; }
         public Guid? CoachId { get; private set; }
-        public Coach? Coach { get; private set; }
-
-        public ICollection<Player> Players { get; private set; } = new List<Player>();
-        public ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
+        public Coach Coach { get; private set; }
+        public ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();        
 
         // EF Core
         private Group() { }

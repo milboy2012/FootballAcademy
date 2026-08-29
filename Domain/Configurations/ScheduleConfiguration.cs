@@ -9,21 +9,19 @@ using System.Threading.Tasks;
 
 namespace Domain.Configurations
 {
-    public class AchievementConfiguration : IEntityTypeConfiguration<Achievement>
+    public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
     {
-        public void Configure(EntityTypeBuilder<Achievement> builder)
+        public void Configure(EntityTypeBuilder<Schedule> builder)
         {
             //таблица
-            builder.ToTable("Achievement");
+            builder.ToTable("Schedule");
 
             // Первичный ключ
             builder.HasKey(u => u.Id);
 
             //свойства
 
-            //связи         
-                
-
+            //связи
 
             //индексы
         }

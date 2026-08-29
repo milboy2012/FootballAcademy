@@ -51,22 +51,35 @@ namespace Domain.Entity
         // Уровень (1-100)
         public int Level { get; private set; }
         // Виртуальные монетки
-        public int VirtualCoins { get; private set; }      
+        public int VirtualCoins { get; private set; }
 
-        // Навигационные свойства
+        // Внешние ключи
+        public ICollection<Score> Scores { get; private set; } = new List<Score>();
+        public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
+        
+
         public Guid? GroupId { get; private set; }
         public Group? Group { get; private set; }
 
-        public Guid? CoachId { get; private set; }
-        public Coach? Coach { get; private set; }
+        public ICollection<PlayerAchievement> PlayerAchievements { get; private set; } = new List<PlayerAchievement>();
 
         public Guid ParentId { get; private set; }
         public Parent? Parent { get; private set; }
 
-        public ICollection<Attendance> Attendances { get; private set; } = new List<Attendance>();
-        public ICollection<Score> Scores { get; private set; } = new List<Score>();
-        public ICollection<PlayerAchievement> Achievements { get; private set; } = new List<PlayerAchievement>();
         public ICollection<Message> Messages { get; private set; } = new List<Message>();
+        public ICollection<Payment> Payments { get; private set; } = new List<Payment>();        
+
+        public Guid GuidId { get; private set; }
+        public User User {  get; private set; }
+        
+        public Guid? SubscriptionId { get; private set; }
+        public Subscription Subscription { get; private set; }
+
+        public Guid? CoachId { get; private set; }
+        public Coach? Coach { get; private set; }
+
+        public ICollection<PlayerAchievement> Achievements { get; private set; } = new List<PlayerAchievement>();
+        
 
         // EF Core
         private Player() { }

@@ -25,8 +25,12 @@ namespace Domain.Configurations
                 b.IsRequired();
                 b.Property(p => p.Amount).HasColumnName("Amount");
                 b.Property(p => p.Currency).HasColumnName("Currency");
-            });
-            
+            });            
+
+            //связи
+
+            //индексы
+
         }
     }
 }
