@@ -1,4 +1,8 @@
 using Domain.Entity;
+using Domain.Interfaces;
+using Domain.Repositories;
+using Domain.Repositories.Interfaces;
+using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UI.Data;
@@ -32,6 +36,29 @@ namespace UI
                 // Включение поддержки UUID (разобрать)
                 //npgsqlOptions.UseNetTopologySuite(); // Для геоданных
             }));
+
+
+            // Регистрация UnitOfWork
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Регистрация репозиториев
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IAchievementRepository, AchievementRepository>();
+            builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            builder.Services.AddScoped<ICoachRepository, CoachRepository>();
+            builder.Services.AddScoped<IGroupRepository,  GroupRepository>();
+            builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            builder.Services.AddScoped<IParentRepository, ParentRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IPlayerAchievementRepository, PlayerAchievementRepository>();
+            builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            builder.Services.AddScoped<IScoreRepository, ScoreRepository>();
+            builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+            builder.Services.AddScoped<ITrainingSessionRepository, TrainingSessionRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
             var app = builder.Build();
 
