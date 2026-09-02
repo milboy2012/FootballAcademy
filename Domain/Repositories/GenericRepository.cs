@@ -39,6 +39,11 @@ namespace Domain.Repositories
             return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
         }
 
+        public virtual async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
+        {
+            await _dbSet.AddAsync(entity, cancellationToken);
+            return entity;
+        }
         public virtual void Update(T entity)
         {
             _dbSet.Update(entity);

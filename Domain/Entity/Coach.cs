@@ -1,22 +1,25 @@
 ﻿using Domain.Enums;
-using Domain.Model;
 using Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Domain.Entity
 {
     public class Coach : User
     {
+        //Идентификатор
+        public Guid CoachId { get; private set; } 
+
         // Тренерский опыт в годах
         public int ExperienceYears { get; private set; }
         // Специализация: вратари, защита, полузащита, нападение
         public string? Specialization { get; private set; }
         // UEFA C, B, A, PRO
-        public string? LicenseLevel { get; private set; } 
+        public string? LicenseLevel { get; private set; }
         public string? Biography { get; private set; }
         public string? PhotoUrl { get; private set; }
 
@@ -25,17 +28,17 @@ namespace Domain.Entity
         public int TotalReviews { get; private set; }
 
         // Внешний ключи        
-        public ICollection<TrainingSession> TrainingSessions{ get; private set; }
-        public ICollection<Player> Players { get; private set; } = new List<Player>();
-        public ICollection<Group> Groups { get; private set; } = new List<Group>();
-        public Guid UserId { get; private set; }
-        public User User { get; private set; }
-        public ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
+        //public ICollection<TrainingSession> TrainingSessions{ get; private set; }
+        //public ICollection<Player> Players { get; private set; } = new List<Player>();
+        //public ICollection<Group> Groups { get; private set; } = new List<Group>();
+        //public Guid UserId { get; private set; }
+        //public User User { get; private set; }
+        //public ICollection<Schedule> Schedules { get; private set; } = new List<Schedule>();
 
 
         // EF Core
         private Coach() { }
-        public Coach(Email email,FullName fullName,int experienceYears,PhoneNumber? phone = null,string? specialization = null,string? licenseLevel = null) : base(email, fullName, UserRole.Coach, phone)
+        public Coach(Email email, FullName fullName, int experienceYears, PhoneNumber? phone = null, string? specialization = null, string? licenseLevel = null) : base(email, fullName, new UserRole("Тренер", null), phone)
         {
             ExperienceYears = experienceYears >= 0 ? experienceYears : throw new ArgumentException("Опыт не может быть отрицательным");
             Specialization = specialization;
@@ -45,12 +48,7 @@ namespace Domain.Entity
         }
 
         //методы
-        public void UpdateProfessionalInfo(
-        int experienceYears,
-        string? specialization,
-        string? licenseLevel,
-        string? biography,
-        string? photoUrl)
+        public void UpdateProfessionalInfo(int experienceYears, string? specialization, string? licenseLevel, string? biography, string? photoUrl)
         {
             ExperienceYears = experienceYears >= 0 ? experienceYears : throw new ArgumentException("Опыт не может быть отрицательным");
             Specialization = specialization;
@@ -77,21 +75,21 @@ namespace Domain.Entity
         {
             if (group == null) throw new ArgumentNullException(nameof(group));
 
-            if (Groups.Any(g => g.Id == group.Id))
-                throw new DomainException("Тренер уже назначен на эту группу");
+            //if (Groups.Any(g => g.Id == group.Id))
+            //    throw new DomainException("Тренер уже назначен на эту группу");
 
-            Groups.Add(group);
+            //Groups.Add(group);
             UpdateTimestamp();
         }
 
         // Снять с группы
         public void RemoveFromGroup(Guid groupId)
         {
-            var group = Groups.FirstOrDefault(g => g.Id == groupId);
-            if (group == null)
-                throw new DomainException("Группа не найдена");
+            //var group = Groups.FirstOrDefault(g => g.Id == groupId);
+            //if (group == null)
+            //    throw new DomainException("Группа не найдена");
 
-            Groups.Remove(group);
+            //Groups.Remove(group);
             UpdateTimestamp();
         }
     }

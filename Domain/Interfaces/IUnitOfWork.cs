@@ -1,4 +1,5 @@
 ﻿using Domain.Entity;
+using Domain.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +11,23 @@ namespace Domain.Interfaces
     public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         // Репозитории
-        IGenericRepository<Achievement> Achievements { get; }
-        IGenericRepository<Attendance> Attendances { get; }
-        IGenericRepository<AuditLog> AuditLogs { get; }
+        //IGenericRepository<Achievement> Achievements { get; }
+        //IGenericRepository<Attendance> Attendances { get; }
+        //IGenericRepository<AuditLog> AuditLogs { get; }
         IGenericRepository<Coach> Coachs { get; }
-        IGenericRepository<Group> Groups { get; }
-        IGenericRepository<Message> Messages { get; }
-        IGenericRepository<Notification> Notifications { get; }
-        IGenericRepository<Parent> Parents { get; }
-        IGenericRepository<Payment> Payments { get; }
-        IGenericRepository<Player> Players { get; }
-        IGenericRepository<PlayerAchievement> PlayerAchievements{ get; }
-        IGenericRepository<Schedule> Shedules { get; }
-        IGenericRepository<Score> Scores { get; }
-        IGenericRepository<Subscription> Subscriptions { get; }
-        IGenericRepository<TrainingSession> TrainingSessions { get; }
+        //IGenericRepository<Group> Groups { get; }
+        //IGenericRepository<Message> Messages { get; }
+        //IGenericRepository<Notification> Notifications { get; }
+        //IGenericRepository<Parent> Parents { get; }
+        //IGenericRepository<Payment> Payments { get; }
+        //IGenericRepository<Player> Players { get; }
+        //IGenericRepository<PlayerAchievement> PlayerAchievements{ get; }
+        //IGenericRepository<Schedule> Shedules { get; }
+        //IGenericRepository<Score> Scores { get; }
+        //IGenericRepository<Subscription> Subscriptions { get; }
+        //IGenericRepository<TrainingSession> TrainingSessions { get; }
         IGenericRepository<User> Users { get; }
+        IUserRepository CustomUsers{ get; }
 
         // Основные методы
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

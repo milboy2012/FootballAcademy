@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Core/Core.csproj" Id="7ebc8800-afa6-412a-b804-a58cfb5476ec" />
   <Project Path="UI/UI.csproj" />
+	<BuildDependency Project="Core/Core.csproj" />
 </Solution>

@@ -13,13 +13,9 @@ namespace Domain.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            // Таблица
-            builder.ToTable("Users");
 
-            // Первичный ключ
-            builder.HasKey(u => u.Id);
 
-            //свойства
+
             builder.ComplexProperty(c => c.Email, b =>
             {
                 b.IsRequired();
@@ -38,38 +34,6 @@ namespace Domain.Configurations
                 b.Property(p => p.Ot).HasColumnName("Ot");
             });
 
-            //связи
-            builder
-                .HasMany(a=>a.AuditLogs)
-                .WithOne(a => a.User)
-                .HasForeignKey(f=>f.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder
-                .HasMany(s => s.Messages)
-                .WithOne(s => s.Sender)
-                .HasForeignKey(f => f.SenderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder
-                .HasOne(s => s.Player)
-                .WithOne(s => s.User);
-
-            builder
-                .HasOne(s => s.Coach)
-                .WithOne(s => s.User);
-
-            builder
-                .HasOne(s => s.Parent)
-                .WithOne(s => s.User);
-
-            builder
-                .HasMany(s=>s.Notifications)
-                .WithOne(s=>s.User)
-                .HasForeignKey(s=>s.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            //индексы
         }
     }
 }

@@ -1,0 +1,29 @@
+﻿<!-- Views/Account/AccessDenied.cshtml -->
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="text-danger mb-3">Access Denied</h2>
+                    <p class="lead">You do not have permission to access this page.</p>
+                    <p class="text-muted">Please contact your administrator if you believe this is a mistake.</p>
+                    <hr />
+                    <a asp-action="Login" asp-controller="Account" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </a>
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

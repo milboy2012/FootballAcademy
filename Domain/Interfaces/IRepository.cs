@@ -13,6 +13,7 @@ namespace Domain.Interfaces
         Task<T?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default);
         //Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
         void Update(T entity);
         void UpdateRange(IEnumerable<T> entities);
         void Delete(T entity);

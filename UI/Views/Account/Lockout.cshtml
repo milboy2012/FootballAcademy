@@ -1,0 +1,26 @@
+﻿<!-- Views/Account/Lockout.cshtml -->
+@{
+    ViewData["Title"] = "Account Locked";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-lock text-warning" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="text-warning mb-3">Account Locked</h2>
+                    <p class="lead">Your account has been locked due to multiple failed login attempts.</p>
+                    <p class="text-muted">Please try again after 5 minutes or contact support.</p>
+                    <hr />
+                    <a asp-action="Login" asp-controller="Account" class="btn btn-warning">
+                        <i class="fas fa-undo"></i> Try Again
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

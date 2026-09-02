@@ -13,40 +13,14 @@ namespace Domain.Configurations
     {
         public void Configure(EntityTypeBuilder<Coach> builder)
         {
-            //таблица
-            builder.ToTable("Coach");
 
-            // Первичный ключ
-            builder.HasKey(u => u.Id);
+            //builder.ToTable("Coach");
 
-            //свойства
+            //builder.HasKey(c => c.Id);
 
-            //связи
-            builder
-                .HasMany(t => t.TrainingSessions)
-                .WithOne(c => c.Coach)
-                .HasForeignKey(f => f.CoachId);
-
-            builder
-                .HasMany(s=>s.Players)
-                .WithOne(s=>s.Coach)
-                .HasForeignKey(s=>s.CoachId)
-                .OnDelete(DeleteBehavior.Restrict);
             
-            builder
-                .HasMany(s=>s.Groups)
-                .WithOne(s=>s.Coach)
-                .HasForeignKey(s=>s.CoachId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder
-                .HasMany(s => s.Schedules)
-                .WithOne(s => s.Coach)
-                .HasForeignKey(s => s.CoachId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-
-            //индексы
+                
+                
         }
     }
 }
