@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace Core.Repositories
             _dbSet.RemoveRange(entities);
         }
 
-        public virtual async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _dbSet.ToListAsync(cancellationToken);
         }
@@ -53,6 +54,21 @@ namespace Core.Repositories
         public virtual void UpdateRange(IEnumerable<T> entities)
         {
             _dbSet.UpdateRange(entities);
+        }
+
+        public IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
+
+        public IQueryable<T> Query(params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query;
         }
     }
 }

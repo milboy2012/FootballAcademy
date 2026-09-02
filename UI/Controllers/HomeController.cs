@@ -21,7 +21,7 @@ namespace UI.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            IReadOnlyCollection<Player> list = await _dat.Players.GetAllAsync(cancellationToken);
+            var list = await _dat.Players.GetAllAsync(cancellationToken);
 
             var parents = await _dat.Parents.GetAllAsync(cancellationToken);
             var coach = await _dat.Coaches.GetAllAsync(cancellationToken);

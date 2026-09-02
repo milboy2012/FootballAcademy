@@ -7,7 +7,266 @@
    
 }
 
-@foreach(var it in Model)
-{
-    <div>@it.FirstName</div>
+
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h1><i class="fas fa-users"></i> Игроки академии</h1>
+        </div>
+        <div class="col text-end">
+            <a href="@Url.Action("Create")" class="btn btn-success">
+                <i class="fas fa-plus"></i> Добавить игрока
+            </a>
+        </div>
+    </div>
+
+    <!-- Контейнер для Tabulator -->
+    <div id="players-table"></div>
+</div>
+
+@section Styles {
+    <style>
+        /* Кастомная стилизация Tabulator */
+        #players-table {
+            height: 600px;
+        }
+        .tabulator-row .tabulator-cell {
+            padding: 8px 10px;
+        }
+        .badge-position {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+}
+
+
+@section Scripts {
+    <script>
+        var tableData = [];
+
+        $(document).ready(function() {
+            // Функция для форматирования данных
+            function formatPosition(cell) {
+                const position = cell.getValue();
+                const colors = {
+                    'Нападающий': 'badge bg-danger',
+                    'Полузащитник': 'badge bg-warning text-dark',
+                    'Защитник': 'badge bg-info',
+                    'Вратарь': 'badge bg-success'
+                };
+                return `<span class="${colors[position] || 'badge bg-secondary'}">${position}</span>`;
+            }
+
+            function formatActions(cell) {
+                const row = cell.getRow();
+                const id = row.getData().id;
+                return `
+                            <div class="btn-group btn-group-sm">
+                                <a href="/Players/Edit/${id}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="deletePlayer('${id}')" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+            }
+
+            // Инициализация Tabulator
+            const table = new Tabulator("#players-table", {
+                //data = tableData,
+                // Серверная обработка
+                ajaxURL: "/Manager/GetData",
+                ajaxConfig: "GET",
+                pagination: "remote",
+                paginationSize: 3,
+                paginationSizeSelector: [3, 10, 25, 50],
+
+                // Параметры, которые Tabulator будет отправлять на сервер
+                ajaxParams: {
+                    // Можно добавить дополнительные параметры
+                },
+
+                // Обработка ответа от сервера
+                
+                // Индикатор загрузки (кастомный)
+                placeholder: "Загрузка данных...",
+
+                // Колонки
+                columns: [
+                    // {
+                    //     title: "ID",
+                    //     field: "id",    
+                    //     width: 100
+                    // },
+                    {
+                        title: "Имя",
+                        field: "firstName",
+                        headerFilter: "input",
+                        width: 120,
+                    },
+                    {
+                        title: "Фамилия",
+                        field: "lastName",
+                        headerFilter: "input",
+                        width: 120,
+                    },
+                    {
+                        title: "Действия",
+                        field: "actions",
+                        formatter: function(cell) {
+                            const data = cell.getRow().getData();
+                            return `
+                                <button onclick="editPlayer('${data.id}')" class="btn btn-sm btn-warning">
+                                    ✏️
+                                </button>
+                                <button onclick="deletePlayer('${data.id}')" class="btn btn-sm btn-danger">
+                                    🗑️
+                                </button>
+                            `;
+                        },
+                        width: 100,
+                        hozAlign: "center"
+                    }
+                    // {
+                    //     title: "Дата рождения",
+                    //     field: "birthDate",
+                    //     align: "center",
+                    //     width: 120,
+                    //     sorter: "date",
+                    // },
+                    // {
+                    //     title: "Возраст",
+                    //     field: "age",
+                    //     align: "center",
+                    //     width: 80,
+                    // },
+                    // {
+                    //     title: "Позиция",
+                    //     field: "position",
+                    //     formatter: formatPosition,
+                    //     headerFilter: "select",
+                    //     headerFilterParams: {
+                    //         values: {
+                    //             "Нападающий": "Нападающий",
+                    //             "Полузащитник": "Полузащитник",
+                    //             "Защитник": "Защитник",
+                    //             "Вратарь": "Вратарь"
+                    //         }
+                    //     },
+                    //     width: 150,
+                    // },
+                    // {
+                    //     title: "Команда",
+                    //     field: "teamName",
+                    //     headerFilter: "input",
+                    //     width: 150,
+                    // },
+                    // {
+                    //     title: "Действия",
+                    //     formatter: formatActions,
+                    //     width: 120,
+                    //     align: "center",
+                    //     cellClick: function(e, cell) {
+                    //         // Предотвращаем переход по ссылке при клике на кнопку
+                    //     }
+                    // }
+                ],
+
+                
+
+                // ajaxResponse: function(url, params, response) {
+                //     console.log("Server response:", response); // Проверяем, что пришло
+
+                //     // Проверяем, что данные есть
+                //     if (!response.data || !Array.isArray(response.data)) {
+                //         console.error("Нет данных!");
+                //         return { data: [], total: 0, last_page: 1 };
+                //     }
+
+                //     // ВОЗВРАЩАЕМ ДАННЫЕ В ПРАВИЛЬНОМ ФОРМАТЕ
+                //     return {
+                //         data: response.data,       // массив
+                //         total: response.total,      // число
+                //         last_page: response.last_page // число
+                //     };                    
+                // },
+
+                layout: "fitColumns",
+                height: "500px",
+                // Настройки внешнего вида
+                // layout: "fitDataFill",
+                // responsiveLayout: "hide",
+                // rowFormatter: function(row) {
+                //    const data = row.getData();
+                //    if (data.age < 10) {
+                //        row.getElement().style.backgroundColor = "#e8f5e9";
+                //    }
+                // },
+
+                // Обработчики событий
+                //rowClick: function(e, row) {
+                //    const data = row.getData();
+                //    window.location.href = `/Players/Details/${data.id}`;
+                //},
+
+                // Локализация
+                // langs: {
+                //     "ru-ru": {
+                //         "pagination": {
+                //             "first": "<<",
+                //             "first_title": "Первая страница",
+                //             "last": ">>",
+                //             "last_title": "Последняя страница",
+                //             "next": ">",
+                //             "next_title": "Следующая страница",
+                //             "prev": "<",
+                //             "prev_title": "Предыдущая страница",
+                //         }
+                //     }
+                // }
+            });
+
+            fetch('/Manager/GetData?page=1&size=10')
+                .then(r => r.json())
+                .then(response => {
+                    console.log('Загружено:', response);
+
+                    // Очищаем и загружаем данные
+                    //table.setData(response.data || []);
+
+                    tableData = response.data;
+
+                    console.log('Строк в таблице:', table.getDataCount());
+                })
+                .catch(e => console.error('Ошибка:', e));
+
+            // Установка языка
+            //table.setLocale("ru-ru");
+
+            // Глобальная функция для удаления игрока
+            // window.deletePlayer = function(id) {
+            //     if (confirm("Вы уверены, что хотите удалить этого игрока?")) {
+            //         $.ajax({
+            //             url: `/Players/Delete/${id}`,
+            //             type: 'POST',
+            //             dataType: 'json',
+            //             success: function() {
+            //                 table.setData();
+            //             },
+            //             error: function() {
+            //                 alert('Ошибка при удалении');
+            //             }
+            //         });
+            //     }
+            // };
+        });
+
+
+
+    </script>
 }
