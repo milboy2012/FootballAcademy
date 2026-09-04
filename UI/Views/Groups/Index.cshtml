@@ -1,0 +1,100 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@{
+    ViewData["Title"] = "Группы";
+}
+@section Styles {
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Группы</h2>
+    <div>
+        <div class="btn-group me-2" role="group">
+            <input type="radio" class="btn-check" name="arch" id="archNo" value="false" checked><label class="btn btn-outline-secondary" for="archNo">Текущие</label>
+            <input type="radio" class="btn-check" name="arch" id="archYes" value="true"><label class="btn btn-outline-secondary" for="archYes">Архив</label>
+        </div>
+        <button class="btn btn-primary" id="btnAdd"><i class="bi bi-plus-lg"></i> Новая группа</button>
+    </div>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-4"><input id="fSearch" class="form-control" placeholder="Название или тренер" /></div>
+    <div class="col-md-4"><select id="fCoach" class="form-select"><option value="">Все тренеры</option></select></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7"><div id="groupsTable"></div></div>
+    <div class="col-lg-5">
+        <div class="card" id="rosterCard" style="display:none">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong id="rosterTitle"></strong>
+                <div class="btn-group btn-group-sm">
+                    <a class="btn btn-outline-secondary" id="btnPrintJournal" target="_blank" title="Журнал посещаемости"><i class="bi bi-journal-check"></i></a>
+                    <a class="btn btn-outline-secondary" id="btnPrintParents" target="_blank" title="Список для родителей"><i class="bi bi-printer"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div class="d-flex gap-2 mb-2">
+                    <select id="moveTarget" class="form-select form-select-sm"><option value="">— отчислить (без группы) —</option></select>
+                    <button class="btn btn-sm btn-outline-primary text-nowrap" id="btnMove" disabled>Перевести выбранных</button>
+                </div>
+                <div id="rosterTable"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Форма группы -->
+<div class="modal fade" id="groupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="groupForm" novalidate>
+            <div class="modal-header"><h5 class="modal-title">Группа</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" />
+                <div class="row g-2">
+                    <div class="col-7"><label class="form-label">Название *</label><input name="name" class="form-control" required placeholder="U-10" /></div>
+                    <div class="col-5"><label class="form-label">Сезон</label><input name="season" class="form-control" placeholder="2026/2027" /></div>
+                    <div class="col-4"><label class="form-label">Год рожд. от *</label><input name="minBirthYear" type="number" class="form-control" required /></div>
+                    <div class="col-4"><label class="form-label">до *</label><input name="maxBirthYear" type="number" class="form-control" required /></div>
+                    <div class="col-4"><label class="form-label">Мест *</label><input name="maxPlayers" type="number" class="form-control" value="16" min="1" max="50" required /></div>
+                    <div class="col-9"><label class="form-label">Тренер *</label><select name="coachId" class="form-select" required></select></div>
+                    <div class="col-3"><label class="form-label">Цвет</label><input name="color" type="color" class="form-control form-control-color w-100" value="#3788d8" /></div>
+                    <div class="col-12"><label class="form-label">Описание</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="formError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Архивация -->
+<div class="modal fade" id="archiveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Архивировать группу</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <p>Будущие тренировки будут отменены. Что сделать с игроками?</p>
+                <select id="archiveMoveTo" class="form-select"><option value="">Освободить (без группы)</option></select>
+                <div class="alert alert-danger mt-3 d-none" id="archiveError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button class="btn btn-warning" id="btnArchiveConfirm">Архивировать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script src="~/js/groups.js" asp-append-version="true"></script>
+}

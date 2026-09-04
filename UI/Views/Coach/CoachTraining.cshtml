@@ -1,0 +1,26 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Мои тренировки";
+}
+
+<h2 class="mb-3">Мои тренировки</h2>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="mb-2"><select id="fGroup" class="form-select form-select-sm w-auto d-inline-block"><option value="">Все мои группы</option></select></div>
+        <div id="calendar"></div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><strong>Ближайшие занятия</strong></div>
+            <div class="list-group list-group-flush" id="upcoming"><div class="list-group-item text-muted">Загрузка…</div></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/ru.global.min.js"></script>
+    <script src="~/js/coach-schedule.js asp-append-version="true"></script>
+}

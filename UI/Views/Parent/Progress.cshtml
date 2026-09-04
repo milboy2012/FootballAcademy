@@ -1,0 +1,39 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Guid
+@{
+    ViewData["Title"] = "Успеваемость";
+}
+<a href="/Cabinet" class="text-decoration-none">&larr; В кабинет</a>
+<div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+    <h2 class="mb-0" id="hTitle">Успеваемость</h2><span class="text-muted" id="hSeason"></span>
+</div>
+<div id="empty" class="alert alert-light d-none">Тренер ещё не выставлял оценки.</div>
+<div id="content">
+    <div class="row g-3 mb-3">
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-header">Профиль навыков <small class="text-muted">(последняя оценка vs начало сезона vs группа)</small></div>
+                <div class="card-body"><canvas id="chRadar"></canvas></div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card h-100">
+                <div class="card-header">Прогресс за сезон</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0" id="tblProgress"><thead><tr><th>Навык</th><th class="text-center">Начало</th><th class="text-center">Сейчас</th><th class="text-center">Изменение</th><th class="text-center">Группа</th></tr></thead><tbody></tbody></table>
+                    <div class="mt-2 text-muted small" id="avgLine"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3"><div class="card-header">Динамика по датам</div><div class="card-body"><canvas id="chLines" height="120"></canvas></div></div>
+    <div class="card"><div class="card-header">Комментарии тренера</div><ul class="list-group list-group-flush" id="comments"></ul></div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>window.playerId = '@Model';</script>
+    <script src="~/js/parent-progress.js" asp-append-version="true"></script>
+}

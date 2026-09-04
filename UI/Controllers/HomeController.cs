@@ -21,11 +21,7 @@ namespace UI.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var list = await _dat.Players.GetAllAsync(cancellationToken);
-
-            var parents = await _dat.Parents.GetAllAsync(cancellationToken);
-            var coach = await _dat.Coaches.GetAllAsync(cancellationToken);
-            var manager = await _dat.Managers.GetAllAsync(cancellationToken);
+            var list = await _dat.Players.GetAllAsync(cancellationToken);            
 
             foreach (Player pl in list) { 
                 

@@ -23,7 +23,7 @@
                             <label asp-for="Email" class="form-label"></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                                <input asp-for="Email" class="form-control" placeholder="Введите свой email(login)" />
                             </div>
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
@@ -63,6 +63,8 @@
         </div>
     </div>
 </div>
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

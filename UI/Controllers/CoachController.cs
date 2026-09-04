@@ -1,17 +1,33 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using UI.Models.ViewModels.Player;
 
 namespace UI.Controllers
 {
     [Authorize(Roles = "Coach, Manager")]
     public class CoachController : Controller
     {
-        // GET: CoachController
-        public ActionResult Index()
-        {
-            return View();
-        }
+        public ActionResult Index() => View();
+        public ActionResult CoachTrainig() => View();
+        public ActionResult Training(Guid id) => View(id);
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // GET: CoachController/Details/5
         public ActionResult Details(int id)

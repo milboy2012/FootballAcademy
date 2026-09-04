@@ -12,6 +12,7 @@ namespace Core.Interfaces
         Task<T?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
         void Update(T entity);
         void UpdateRange(IEnumerable<T> entities);
         void Delete(T entity);
@@ -19,5 +20,7 @@ namespace Core.Interfaces
 
         IQueryable<T> Query();
         IQueryable<T> Query(params Expression<Func<T, object>>[] includes);
+        IQueryable<T> GetByCondition(Expression<Func<T, bool>> predicate);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
     }
 }

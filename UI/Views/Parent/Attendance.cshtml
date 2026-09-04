@@ -1,0 +1,41 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Guid
+@{
+    ViewData["Title"] = "Посещаемость";
+}
+<a href="/Cabinet" class="text-decoration-none">&larr; В кабинет</a>
+<div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+    <h2 class="mb-0" id="hTitle">Посещаемость</h2>
+    <div class="d-flex gap-2">
+        <input type="date" id="fFrom" class="form-control form-control-sm" /><input type="date" id="fTo" class="form-control form-control-sm" />
+        <button class="btn btn-sm btn-outline-primary" id="btnApply">Показать</button>
+    </div>
+</div>
+
+<div class="row g-3 mb-3" id="stats">
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body"><div class="fs-2 fw-bold" id="sPercent">–</div><div class="text-muted">посещаемость</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body"><div class="fs-2 fw-bold" id="sTotal">–</div><div class="text-muted">тренировок</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body"><div class="fs-2 fw-bold text-success" id="sPresent">–</div><div class="text-muted">посещено</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body"><div class="fs-2 fw-bold text-danger" id="sAbsent">–</div><div class="text-muted">пропущено</div></div></div></div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-md-8"><div class="card"><div class="card-header">По месяцам</div><div class="card-body"><canvas id="chMonths" height="110"></canvas></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-header">Причины пропусков</div><div class="card-body"><canvas id="chReasons" height="110"></canvas></div></div></div>
+</div>
+<div class="card">
+    <div class="card-header">История</div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+            <thead><tr><th>Дата</th><th>Место</th><th class="text-center">Отметка</th><th>Комментарий тренера</th><th>Отличились</th></tr></thead>
+            <tbody id="rows"></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>window.playerId = '@Model';</script>
+    <script src="~/js/parent-attendance.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,37 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Мой кабинет";
+}
+
+<div id="notLinked" class="alert alert-warning d-none">Твоя учётная запись пока не привязана к ученику. Попроси родителей или тренера разобраться.</div>
+
+<div id="home" class="d-none">
+    <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fs-2 fw-bold" id="avatar" style="width:72px;height:72px;background:#3788d8"></div>
+            <div class="flex-grow-1">
+                <h2 class="mb-0" id="hName"></h2>
+                <div class="text-muted" id="hSub"></div>
+            </div>
+            <a class="btn btn-primary" href="/My/Schedule"><i class="bi bi-calendar-week"></i> Расписание</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3"><div class="card text-center h-100"><div class="card-body"><div class="fs-1 fw-bold text-primary" id="sPresent">–</div><div class="text-muted">тренировок посетил</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card text-center h-100"><div class="card-body"><div class="fs-1 fw-bold" id="sPercent">–</div><div class="text-muted">посещаемость</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card text-center h-100"><div class="card-body"><div class="fs-1 fw-bold text-warning" id="sStreak">–</div><div class="text-muted">подряд без пропусков 🔥</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card text-center h-100"><div class="card-body"><div class="fs-1 fw-bold text-secondary" id="sTotal">–</div><div class="text-muted">всего тренировок</div></div></div></div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6"><div class="card h-100"><div class="card-header"><strong>Следующее занятие</strong></div><div class="card-body" id="next"></div></div></div>
+        <div class="col-md-6"><div class="card h-100"><div class="card-header"><strong>Тренер отметил</strong></div><div class="card-body" id="highlights"></div></div></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/player-cab.js" asp-append-version="true"></script>
+}

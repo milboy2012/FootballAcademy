@@ -15,8 +15,12 @@ namespace Core.Entity
         public bool IsActive { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
+        // Временный пароль: при входе требуется смена.
+        public bool MustChangePassword { get; set; }
+
 
         // Навигационные свойства
         //public virtual ICollection<Player> Players { get; set; }
+        //public virtual ICollection<AppRole> UserRoles { get; set; }
     }
 }

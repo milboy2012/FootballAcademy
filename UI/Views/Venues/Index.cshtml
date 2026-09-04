@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Места тренировок";
+    var isStaff = User.IsInRole("Manager") || User.IsInRole("Coach");
+    var isAdmin = User.IsInRole("Manager");
+}
+
+@section Styles {
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Места тренировок</h2>
+    @if (isStaff)
+    {
+        <button class="btn btn-primary" id="btnAdd"><i class="bi bi-plus-lg"></i> Добавить</button>
+    }
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input id="fSearch" class="form-control" placeholder="Поиск по фамилии / имени / родителю" />
+    </div>
+    <div class="col-md-3">
+        <select id="fGroup" class="form-select"><option value="">Все группы</option></select>
+    </div>
+    <div class="col-md-2">
+        <select id="fActive" class="form-select">
+            <option value="">Все</option>
+            <option value="true" selected>Активные</option>
+            <option value="false">Неактивные</option>
+        </select>
+    </div>
+</div>
+
+<div id="playersTable"></div>
+
+@if (isStaff)
+{
+    <div class="modal fade" id="playerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" id="playerForm" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">Ученик</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" />
+                    <div class="row g-2">
+                        <div class="col-6"><label class="form-label">Название</label><input name="name" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Адрес</label><input name="address" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Открытое</label><input name="birthDate" type="checkbox" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Вместимость</label><input name="medicalCertificateUntil" class="form-control" /></div>
+                        <div class="col-12"><label class="form-label">Активно</label><input name="parentId" class="form-select" type="checkbox" required></input></div>
+                        <div class="col-12"><label class="form-label">Запланировано тренировок</label><input name="medicalCertificateUntil" class="form-control" /></div>                        
+                        <div class="col-12 form-check ms-2">
+                            <input name="isActive" type="checkbox" class="form-check-input" id="chkActive" checked />
+                            <label class="form-check-label" for="chkActive">Активен</label>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger mt-3 d-none" id="formError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script>
+        window.playersPage = { isStaff: @isStaff.ToString().ToLower(), isAdmin: @isAdmin.ToString().ToLower() };
+    </script>
+    <script src="~/js/venue.js" asp-append-version="true"></script>
+}

@@ -127,6 +127,15 @@
 
                             }
 
+                            @if (User.IsInRole("Parent"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Cabinet" asp-action="Index">
+                                        <i class="fas fa-chart-line"></i> Личный кабинет
+                                    </a>
+                                </li>
+                            }
+
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                             {
                                 <li class="nav-item">
@@ -135,7 +144,7 @@
                                     </a>
                                 </li>
                             }
-                        }
+                            }
                     </ul>
 
                     <ul class="navbar-nav">
@@ -185,17 +194,69 @@
         @RenderBody()
     </main>
 
+    @* Модальное окно для отображения изменения пароля *@
+@if (Context.Items["MustChangePassword"] is true)
+{
+    <div class="modal fade" id="forcePwdModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <form class="modal-content" id="forcePwdForm" method="post" asp-controller="Account" asp-action="ChangePassword">
+                @Html.AntiForgeryToken()
+                <div class="modal-header"><h5 class="modal-title">Задайте свой пароль</h5></div>
+                <div class="modal-body">
+                    <p class="text-muted">Вы вошли с временным паролем. Для продолжения работы придумайте собственный.</p>
+                    <div class="mb-2">
+                        <label class="form-label">Временный пароль</label>
+                        <input name="CurrentPassword" type="password" class="form-control" required autocomplete="current-password" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Новый пароль</label>
+                        <input name="NewPassword" type="password" class="form-control" required minlength="6" autocomplete="new-password" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Повторите пароль</label>
+                        <input name="ConfirmPassword" type="password" class="form-control" required autocomplete="new-password" />
+                    </div>
+                    <div class="form-text">Минимум 6 символов, заглавная и строчная буква, цифра, спецсимвол.</div>
+                    <div class="alert alert-danger mt-3 d-none" id="forcePwdError"></div>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-link" href="#" onclick="document.getElementById('logoutForm').submit();return false;">Выйти</a>
+                    <button type="submit" class="btn btn-primary">Сохранить и продолжить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        (() => {
+            const m = new bootstrap.Modal('#forcePwdModal'); m.show();
+            const f = document.getElementById('forcePwdForm'), err = document.getElementById('forcePwdError');
+            f.addEventListener('submit', async e => {
+                e.preventDefault();
+                if (f.NewPassword.value !== f.ConfirmPassword.value) {
+                    err.textContent = 'Пароли не совпадают'; err.classList.remove('d-none'); return;
+                }
+                const r = await fetch(f.action, { method: 'POST', body: new FormData(f) });
+                const body = await r.json().catch(() => null);
+                if (r.ok) { location.href = body.redirect || '/'; return; }
+                err.textContent = body?.error ?? `Ошибка ${r.status}`; err.classList.remove('d-none');
+            });
+        })();
+    </script>
+}
+
+
     <footer class="footer bg-dark text-white py-3 mt-5">
         <div class="container text-center">
             <small>&copy; @DateTime.Now.Year - YourApp - All rights reserved</small>
         </div>
     </footer>
 
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Tabulator -->
-    <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.5.0/dist/js/tabulator.min.js"></script>
+    @* <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.5.0/dist/js/tabulator.min.js"></script> *@
 
     <!-- FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -205,5 +266,7 @@
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    
 </body>
 </html>

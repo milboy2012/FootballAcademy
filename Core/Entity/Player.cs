@@ -6,27 +6,29 @@ using System.Threading.Tasks;
 
 namespace Core.Entity
 {
-    public class Player : AppUser
+    public class Player : BaseEntity
     {
-        public DateTime BirthDate { get; set; }           // Дата рождения
-        public int Age => DateTime.UtcNow.Year - BirthDate.Year; // Вычисляемое поле (не хранить в БД)
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public DateOnly BirthDate { get; set; }
+        public DateOnly? MedicalCertificateUntil { get; set; }
+        //public int Age => DateTime.UtcNow.Year - BirthDate.Year; // Вычисляемое поле (не хранить в БД)
 
-        // Медицинские данные (шифруются!)
-        public string? MedicalNotes { get; set; }          // Аллергии, травмы
-        public string? EmergencyContact { get; set; }      // Телефон родителя (дубль)
+        public bool IsActive { get; set; } = true;
+        public string? Note { get; set; }
 
-        // Внешние ключи
-        public Guid? GroupId { get; set; }                 // Может быть без группы (на пробе)
-        public Guid? ParentId { get; set; }                 // Ссылка на родителя (User)
-        public Guid? CoachId { get; set; }                 // Персональный тренер (если есть)
+        public Guid ParentId { get; set; }
+        public AppUser Parent { get; set; } = null!;
 
-        // Навигационные свойства
-        public Group Group { get; set; }
-        public AppUser Parent { get; set; }
-        public AppUser Coach { get; set; }
+        public Guid? GroupId { get; set; }
+        public TrainingGroup? Group { get; set; }
 
-        // Аудит
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }        
+        // Учётная запись ребёнка 
+        public Guid? UserId { get; set; }
+        public AppUser? User { get; set; }
+
+        public ICollection<Attendance> Attendances { get; set; } = [];
+        public ICollection<Subscription> Subscriptions { get; set; } = [];
+        public ICollection<AbsenceNotice> AbsenceNotices{ get; set; } = [];
     }
 }

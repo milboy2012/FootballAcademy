@@ -1,16 +1,17 @@
 using Core;
 using Core.Entity;
 using Core.Interfaces;
+using Core.Options;
 using Core.Repositories;
-using Domain.Entity;
-using Domain.Enums;
-using Domain.Interfaces;
-using Domain.Repositories;
-using Domain.Repositories.Interfaces;
-using Domain.UnitOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UI.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using UI.Filters;
+using UI.Services;
+using UI.Services.Interfaces;
+using UI.Services.Options;
 
 
 namespace UI
@@ -35,14 +36,14 @@ namespace UI
             //строка подключения к базе данных postgresql
             var pgconnectionString = builder.Configuration.GetConnectionString("pgconnectionString");
 
-            builder.Services.AddDbContext<Context>(options => options.UseNpgsql(pgconnectionString, npgsqlOptions =>
-            {
-                //настройка миграции
-                npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "public");
+            //builder.Services.AddDbContext<Context>(options => options.UseNpgsql(pgconnectionString, npgsqlOptions =>
+            //{
+            //    //настройка миграции
+            //    npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "public");
 
-                // Включение поддержки UUID (разобрать)
-                //npgsqlOptions.UseNetTopologySuite(); // Для геоданных
-            }));
+            //    // Включение поддержки UUID (разобрать)
+            //    //npgsqlOptions.UseNetTopologySuite(); // Для геоданных
+            //}));
 
 
             var pgconnectionStringAuth = builder.Configuration.GetConnectionString("pgconnectionStringAuth");
@@ -57,14 +58,14 @@ namespace UI
             }));
 
             // Регистрация UnitOfWork
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Регистрация репозиториев
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             //builder.Services.AddScoped<IAchievementRepository, AchievementRepository>();
             //builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             //builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-            builder.Services.AddScoped<ICoachRepository, CoachRepository>();
+            //builder.Services.AddScoped<ICoachRepository, CoachRepository>();
             //builder.Services.AddScoped<IGroupRepository,  GroupRepository>();
             //builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             //builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -75,10 +76,22 @@ namespace UI
             //builder.Services.AddScoped<IScoreRepository, ScoreRepository>();
             //builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             //builder.Services.AddScoped<ITrainingSessionRepository, TrainingSessionRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            //builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+            //Core
             builder.Services.AddScoped<IUoW, UoW>();
             builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
+
+            //UI
+            builder.Services.AddScoped<IPlayerService, PlayerService>();
+            builder.Services.AddScoped<IPlayerAccountService, PlayerAccountService>();
+            builder.Services.AddScoped<ICoachOnboardingService, CoachOnboardingService>();
+            builder.Services.AddScoped<IGroupService, GroupService>();
+            builder.Services.AddScoped<ICoachTrainingService, CoachTrainingService>();
+            builder.Services.AddScoped<IParentService, ParentService>();
+            builder.Services.AddScoped<IPlayerCabinetService, PlayerCabinetService>();
+
+
 
             // Настройка Identity с кастомными моделями
             builder.Services.AddIdentity<AppUser, AppRole>(options =>
@@ -111,6 +124,70 @@ namespace UI
                 options.LogoutPath = "/Account/Logout";
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
+
+                //для /api/* вместо редиректа на страницу логина возвращался 401 (иначе Tabulator получит HTML)
+                options.Events.OnRedirectToLogin = ctx =>
+                {
+                    if (ctx.Request.Path.StartsWithSegments("/api"))
+                    {
+                        ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+                    ctx.Response.Redirect(ctx.RedirectUri);
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = ctx =>
+                {
+                    if (ctx.Request.Path.StartsWithSegments("/api"))
+                    {
+                        ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return Task.CompletedTask;
+                    }
+                    ctx.Response.Redirect(ctx.RedirectUri);
+                    return Task.CompletedTask;
+                };
+            });
+
+            //Фильтрация, если у пользователя признак временного пароля перенаправляем его на смену
+            builder.Services.AddScoped<MustChangePasswordFilter>();
+            builder.Services.AddControllersWithViews(o => o.Filters.AddService<MustChangePasswordFilter>());
+
+            //Блокировка активной сессии время
+            builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
+
+            //------------JWT-
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+            var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
+                      ?? throw new InvalidOperationException("Секция Jwt не найдена");
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                // «умная» схема: смотрит, есть ли Bearer-заголовок, иначе — cookie Identity
+                options.DefaultScheme = "CookieOrJwt";
+                options.DefaultChallengeScheme = "CookieOrJwt";
+            })
+            .AddPolicyScheme("CookieOrJwt", "Cookie or JWT", options =>
+            {
+                options.ForwardDefaultSelector = ctx =>
+                    ctx.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                        ? JwtBearerDefaults.AuthenticationScheme
+                        : IdentityConstants.ApplicationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwt.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwt.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromSeconds(30)
+                };
             });
 
 

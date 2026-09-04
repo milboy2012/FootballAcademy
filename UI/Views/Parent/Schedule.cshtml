@@ -1,0 +1,48 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Расписание детей";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Расписание</h2>
+    <select id="fChild" class="form-select w-auto"><option value="">Все дети</option></select>
+</div>
+<div id="legend" class="mb-2 small"></div>
+<div id="calendar"></div>
+
+<div class="modal fade" id="evModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="evTitle"></h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div id="evInfo" class="mb-3"></div>
+                <div id="noticeWrap">
+                    <hr /><h6>Предупредить о пропуске</h6>
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <select id="nReason" class="form-select">
+                                <option value="Excused">Семейные обстоятельства</option>
+                                <option value="Sick">Болезнь</option>
+                                <option value="Late">Опоздаем</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7"><input id="nComment" class="form-control" placeholder="Комментарий тренеру (необязательно)" /></div>
+                    </div>
+                    <div class="alert alert-danger mt-2 d-none" id="nErr"></div>
+                </div>
+                <div id="noticedInfo" class="alert alert-info d-none mt-3">Вы предупредили о пропуске. <a href="#" id="btnWithdraw">Отменить предупреждение</a></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button class="btn btn-warning" id="btnNotice">Отправить предупреждение</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/ru.global.min.js"></script>
+    <script src="~/js/parent-schedule.js" asp-append-version="true"></script>
+}

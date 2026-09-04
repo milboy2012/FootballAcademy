@@ -1,0 +1,109 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Пользователи";
+}
+@section Styles {
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Пользователи</h2>
+    <button class="btn btn-primary" id="btnAddManager"><i class="bi bi-person-plus"></i> Новый менеджер</button>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-4"><input id="fSearch" class="form-control" placeholder="ФИО, email, телефон" /></div>
+    <div class="col-md-3"><select id="fRole" class="form-select"><option value="">Все роли</option></select></div>
+    <div class="col-md-2">
+        <select id="fActive" class="form-select">
+            <option value="">Все</option>
+            <option value="true" selected>Активные</option>
+            <option value="false">Заблокированные</option>
+        </select>
+    </div>
+</div>
+<div id="usersTable"></div>
+
+<!-- Карточка пользователя -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="umTitle"></h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <h6>Профиль</h6>
+                        <form id="profileForm" novalidate>
+                            <div class="row g-2">
+                                <div class="col-6"><label class="form-label">Фамилия</label><input name="lastName" class="form-control" required /></div>
+                                <div class="col-6"><label class="form-label">Имя</label><input name="firstName" class="form-control" required /></div>
+                                <div class="col-12"><label class="form-label">Телефон</label><input name="phone" class="form-control" /></div>
+                                <div class="col-12"><label class="form-label">Email</label><input id="umEmail" class="form-control" disabled /></div>
+                            </div>
+                            <button class="btn btn-primary btn-sm mt-3">Сохранить профиль</button>
+                        </form>
+                    </div>
+                    <div class="col-md-5">
+                        <h6>Роль и доступ</h6>
+                        <div class="input-group mb-2">
+                            <select id="umRole" class="form-select"></select>
+                            <button class="btn btn-outline-primary" id="btnRole">Сменить</button>
+                        </div>
+                        <ul class="list-unstyled small text-muted" id="umInfo"></ul>
+                        <hr />
+                        <button class="btn btn-sm w-100 mb-2" id="btnBlock"></button>
+                        <button class="btn btn-sm btn-outline-secondary w-100" id="btnReset"><i class="bi bi-key"></i> Сбросить пароль</button>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="umError"></div>
+                <div class="alert alert-success mt-3 d-none" id="umOk"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Новый менеджер -->
+<div class="modal fade" id="managerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="managerForm" novalidate>
+            <div class="modal-header"><h5 class="modal-title">Новый менеджер</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="row g-2">
+                    <div class="col-12"><label class="form-label">Email *</label><input name="email" type="email" class="form-control" required /></div>
+                    <div class="col-6"><label class="form-label">Фамилия *</label><input name="lastName" class="form-control" required /></div>
+                    <div class="col-6"><label class="form-label">Имя *</label><input name="firstName" class="form-control" required /></div>
+                    <div class="col-12"><label class="form-label">Телефон</label><input name="phone" class="form-control" /></div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="mgrError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Временный пароль -->
+<div class="modal fade" id="credsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Данные для входа</h5></div>
+            <div class="modal-body">
+                <p class="mb-1">Логин: <code id="credEmail"></code></p>
+                <p class="mb-1">Пароль: <code id="credPassword"></code></p>
+                <small class="text-muted">Показывается один раз. При входе потребуется задать новый пароль.</small>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" data-bs-dismiss="modal">Готово</button></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script src="~/js/users.js" asp-append-version="true"></script>
+}

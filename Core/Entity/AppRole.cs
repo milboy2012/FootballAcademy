@@ -14,5 +14,7 @@ namespace Core.Entity
         public DateTime CreatedAt { get; set; }
 
         //public virtual ICollection<IdentityUserRole<Guid>> UserRoles { get; set; }
+        
+        
     }
 }

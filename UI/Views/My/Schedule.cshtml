@@ -1,0 +1,32 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Моё расписание";
+}
+<a href="/My" class="text-decoration-none">&larr; В кабинет</a>
+<h2 class="mt-2 mb-3">Ближайшие 2 недели</h2>
+<div id="list" class="d-flex flex-column gap-2"><div class="text-muted">Загрузка…</div></div>
+
+<div class="modal fade" id="nModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Не смогу прийти</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3 text-muted" id="nWhen"></div>
+                <div class="d-grid gap-2 mb-3">
+                    <input type="radio" class="btn-check" name="reason" id="rExcused" value="Excused" checked><label class="btn btn-outline-primary text-start" for="rExcused">🏠 Не смогу прийти</label>
+                    <input type="radio" class="btn-check" name="reason" id="rSick" value="Sick"><label class="btn btn-outline-primary text-start" for="rSick">🤒 Болею</label>
+                    <input type="radio" class="btn-check" name="reason" id="rLate" value="Late"><label class="btn btn-outline-primary text-start" for="rLate">⏰ Опоздаю</label>
+                </div>
+                <input id="nComment" class="form-control" maxlength="200" placeholder="Что-то ещё для тренера (необязательно)" />
+                <div class="alert alert-danger mt-3 d-none" id="nErr"></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Назад</button><button class="btn btn-warning" id="btnSend">Сообщить тренеру</button></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/player-schedule.js" asp-append-version="true"></script>
+}

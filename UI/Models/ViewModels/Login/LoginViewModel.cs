@@ -5,7 +5,7 @@ namespace UI.Models.ViewModels.Login
     public class LoginViewModel
     {
         [Required]
-        [EmailAddress]
+        //[EmailAddress]
         public string Email { get; set; }
 
         [Required]

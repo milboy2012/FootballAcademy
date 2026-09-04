@@ -21,6 +21,12 @@ namespace Core.Repositories
             _dbSet = _context.Set<T>();
         }
 
+        private void Test()
+        {
+            IQueryable<Player> pl = _context.Players.AsNoTracking().AsQueryable();
+            
+        }
+
         public virtual void Delete(T entity)
         {
             _dbSet.Remove(entity);
@@ -46,6 +52,15 @@ namespace Core.Repositories
             await _dbSet.AddAsync(entity, cancellationToken);
             return entity;
         }
+
+        public virtual async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+        {
+            var entityList = entities.ToList();
+            await _dbSet.AddRangeAsync(entityList, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return entityList;
+        }
+
         public virtual void Update(T entity)
         {
             _dbSet.Update(entity);
@@ -69,6 +84,15 @@ namespace Core.Repositories
                 query = query.Include(include);
             }
             return query;
+        }
+
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate);
+        }
+        public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.AnyAsync(predicate, cancellationToken);
         }
     }
 }

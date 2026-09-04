@@ -35,23 +35,23 @@ namespace UI.Controllers
             [FromQuery] string? sort = null,
             [FromQuery] string? field = null)
         {
-            Player player = new Player
-            {
-                FirstName = "Иванов",
-                LastName = "Иван",
-                BirthDate = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow,
-                Email = "parent@example.com",
-                UserName = "parent",
+            //Player player = new Player
+            //{
+            //    FirstName = "Иванов",
+            //    LastName = "Иван",
+            //    BirthDate = DateTime.UtcNow,
+            //    CreatedAt = DateTime.UtcNow,
+            //    Email = "parent@example.com",
+            //    UserName = "parent",
                 
-                IsActive = true
-            };
+            //    IsActive = true
+            //};
 
 
-            var result = await _userManager.CreateAsync(player, "Gjktnbkj22@");
-            if (result.Succeeded) {
-                _userManager.AddToRoleAsync(player, "Player");
-            }
+            //var result = await _userManager.CreateAsync(player, "Gjktnbkj22@");
+            //if (result.Succeeded) {
+            //    _userManager.AddToRoleAsync(player, "Player");
+            //}
             _data.SaveEntitiesAsync();
 
 

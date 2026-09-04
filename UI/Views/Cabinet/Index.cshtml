@@ -1,0 +1,142 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model UI.Models.ViewModels.Cabinet.CabinetVm
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">@Model.ParentName</h2>
+        <div class="text-muted">@Model.Email @(Model.Phone is null ? "" : $"· {Model.Phone}")</div>
+    </div>
+    <button class="btn btn-primary" id="btnAdd"><i class="bi bi-plus-lg"></i> Добавить ребёнка</button>
+</div>
+
+@if (Model.ShowWelcome)
+{
+    <div class="alert alert-success">
+        Регистрация прошла успешно! Добавьте своего ребёнка, чтобы записать его в академию.
+    </div>
+}
+
+<div class="row g-3" id="children">
+    @if (Model.Children.Count == 0)
+    {
+        <div class="col-12"><div class="card card-body text-center text-muted py-5">Пока нет добавленных детей</div></div>
+    }
+    @foreach (var c in Model.Children)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 @(c.IsActive ? "" : "opacity-50")">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title mb-1">@c.FullName</h5>
+                        <button class="btn btn-sm btn-outline-secondary" data-edit="@c.Id" title="Изменить"><i class="bi bi-pencil"></i></button>
+                    </div>
+                    <div class="text-muted mb-2">@c.Age лет · @c.BirthDate.ToString("dd.MM.yyyy")</div>
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Группа</dt>
+                        <dd class="col-7">@(c.GroupName ?? "ожидает распределения")</dd>
+                        <dt class="col-5">Тренер</dt>
+                        <dd class="col-7">@(c.CoachName ?? "—")</dd>
+                        <dt class="col-5">Медсправка</dt>
+                        <dd class="col-7 @(c.MedicalExpired ? "text-danger" : "")">
+                            @(c.MedicalUntil?.ToString("dd.MM.yyyy") ?? "не загружена")
+                        </dd>
+                        <dt class="col-5">Абонемент</dt>
+                        <dd class="col-7">
+                            @if (c.ActiveSubscriptionUntil is not null)
+                            {
+                                <span class="text-success">до @c.ActiveSubscriptionUntil?.ToString("dd.MM.yyyy")</span>
+                            }
+                            else
+                            {
+
+                                <span class="text-warning">не оплачен</span>
+                            }
+                        </dd>
+                        <dt class="col-5">Ближайшая тренировка</dt>
+                        <dd class="col-7">@(c.NextTraining?.ToLocalTime().ToString("dd.MM HH:mm") ?? "—")</dd>
+
+                        @* Создание учетной записи *@
+                        <dt class="col-5">Учётная запись</dt>
+                        <dd class="col-7">
+                            @if (c.Login is null)
+                            {
+                                <button class="btn btn-sm btn-outline-success py-0" data-create-account="@c.Id">Создать</button>
+                            }
+                            else
+                            {
+                                <code>@c.Login</code>
+                                <div class="mt-1">
+                                    <button class="btn btn-sm btn-link p-0 me-2" data-reset="@c.Id">сбросить пароль</button>
+                                    <button class="btn btn-sm btn-link p-0 @(c.AccountActive == true ? "text-danger" : "text-success")"
+                                            data-toggle="@c.Id" data-active="@(c.AccountActive == true ? "false" : "true")">
+                                        @(c.AccountActive == true ? "отключить" : "включить")
+                                    </button>
+                                </div>
+                            }
+                        </dd>
+
+                    </dl>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a class="btn btn-sm btn-link px-0" asp-controller="Schedule" asp-action="Index" asp-route-playerId="@c.Id">Расписание</a>
+                    <a class="btn btn-sm btn-link" asp-controller="Payments" asp-action="Index" asp-route-playerId="@c.Id">Оплата</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="childModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="childForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title">Ребёнок</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id" />
+                <div class="row g-2">
+                    <div class="col-6"><label class="form-label">Фамилия</label><input name="lastName" class="form-control" required maxlength="100" /></div>
+                    <div class="col-6"><label class="form-label">Имя</label><input name="firstName" class="form-control" required maxlength="100" /></div>
+                    <div class="col-6"><label class="form-label">Дата рождения</label><input name="birthDate" type="date" class="form-control" required /></div>
+                    <div class="col-6"><label class="form-label">Медсправка до</label><input name="medicalCertificateUntil" type="date" class="form-control" /></div>
+                    <div class="col-12"><label class="form-label">Примечание (особенности здоровья, пожелания)</label><textarea name="note" class="form-control" rows="2" maxlength="1000"></textarea></div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="formError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="credsModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Данные для входа</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">Логин: <code id="credLogin"></code></p>
+                <p class="mb-1">Пароль: <code id="credPassword"></code></p>
+                <small class="text-muted">Сохраните пароль — повторно он не показывается. Ребёнок входит на странице «Вход», указывая логин вместо email.</small>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">Готово</button></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cabinet.js" asp-append-version="true"></script>
+}

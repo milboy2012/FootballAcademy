@@ -40,7 +40,7 @@ namespace Core
                             "Manager" => "Менеджер",
                             "Coach" => "Тренер",
                             "Parent" => "Родитель(опекун)",
-                            "Player" => "Игрок"
+                            "Player" => "Ученик академии"
                         },
                         IsAdministration = isAdmin,
                         CreatedAt = DateTime.UtcNow,
@@ -54,7 +54,7 @@ namespace Core
             var adminUser = await userManager.FindByEmailAsync("manager@example.com");
             if (adminUser == null)
             {
-                var user = new Manager
+                var user = new AppUser
                 {
                     Id = Guid.NewGuid(),
                     UserName = "manager@example.com",

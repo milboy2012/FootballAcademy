@@ -3,3 +3,71 @@
 *@
 @{
 }
+
+@{
+    ViewData["Title"] = "Тренеры";
+}
+@section Styles {
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Тренеры</h2>
+    <button class="btn btn-primary" id="btnAdd"><i class="bi bi-person-plus"></i> Принять на работу</button>
+</div>
+<div id="coachesTable"></div>
+
+<!-- Форма создания -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="createForm" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title">Новый тренер</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2">
+                    <label class="form-label">Email *</label>
+                    <input name="email" type="email" class="form-control" required autofocus />
+                </div>
+                <div class="row g-2">
+                    <div class="col-6"><label class="form-label">Фамилия</label><input name="lastName" class="form-control" /></div>
+                    <div class="col-6"><label class="form-label">Имя</label><input name="firstName" class="form-control" /></div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="createError"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Показ временного пароля -->
+<div class="modal fade" id="credsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Учётная запись создана</h5></div>
+            <div class="modal-body">
+                <p>Передайте тренеру данные для первого входа:</p>
+                <div class="input-group mb-2">
+                    <span class="input-group-text">Логин</span>
+                    <input class="form-control" id="credEmail" readonly />
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text">Пароль</span>
+                    <input class="form-control font-monospace" id="credPassword" readonly />
+                    <button class="btn btn-outline-secondary" id="btnCopy" type="button"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <small class="text-muted">Пароль временный и показывается один раз. При первом входе тренер обязан задать собственный пароль.</small>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" data-bs-dismiss="modal">Готово</button></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script src="~/js/coaches.js" asp-append-version="true"></script>
+}
