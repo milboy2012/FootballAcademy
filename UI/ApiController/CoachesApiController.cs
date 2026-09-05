@@ -42,7 +42,8 @@ namespace UI.ApiController
                     GroupsCount = c.Groups.Count
                 })
                 .ToListAsync(ct);
-            return Ok(new { data });
+            //return Ok(new { data });
+            return Ok(data);
         }
 
         [HttpPost]

@@ -19,7 +19,7 @@ namespace UI.ApiController
         public VenuesApiController(IUoW data) => _data = data;
 
         /// <summary>Список доступен всем авторизованным (нужен тренерам для расписания).</summary>
-        [HttpGet]
+        [HttpGet()]
         public async Task<IActionResult> List([FromQuery] bool? active, CancellationToken ct)
         {
             var q = _data.Venues.Query().AsNoTracking();
@@ -37,6 +37,7 @@ namespace UI.ApiController
                 UpcomingTrainings = v.Trainings.Count(t => t.StartsAt >= now && t.Status == TrainingStatus.Planned)
             }).ToListAsync(ct);
             return Ok(new { data });
+            //return Ok(data);
         }
 
         [HttpPost]

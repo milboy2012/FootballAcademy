@@ -90,6 +90,7 @@ namespace UI
             builder.Services.AddScoped<ICoachTrainingService, CoachTrainingService>();
             builder.Services.AddScoped<IParentService, ParentService>();
             builder.Services.AddScoped<IPlayerCabinetService, PlayerCabinetService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 

@@ -30,8 +30,8 @@ namespace UI.Models.ViewModels.Login
         [StringLength(50, MinimumLength = 2)]
         public string LastName { get; set; }
 
-        [Display(Name = "Роль")]
-        public string SelectedRole { get; set; }
+        //[Display(Name = "Роль")]
+        //public string SelectedRole { get; set; }
 
         public List<RoleViewModel> Roles { get; set; } = new List<RoleViewModel>();
     }

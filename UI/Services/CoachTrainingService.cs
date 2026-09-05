@@ -76,7 +76,7 @@ namespace UI.Services
                 var age = today.Year - p.BirthDate.Year; if (p.BirthDate > today.AddYears(-age)) age--;
                 return new AttendanceRowDto(p.Id, p.LastName, p.FirstName, age,
                     p.MedicalCertificateUntil is not null && p.MedicalCertificateUntil >= today, p.HasSub,
-                    m?.Present, m?.Reason, m?.Comment, p.Total == 0 ? 0 : p.Present * 100 / p.Total);
+                    m?.Present, m?.Reason, m?.Comment, p.Total == 0 ? 0 : p.Present * 100 / p.Total, "");
             }).ToList();
 
             // игроки, которые были отмечены, но уже покинули группу — тоже показываем
@@ -85,7 +85,7 @@ namespace UI.Services
             {
                 var extra = await _data.Players.Query().AsNoTracking().Where(p => gone.Contains(p.Id))
                     .Select(p => new { p.Id, p.LastName, p.FirstName }).ToListAsync(ct);
-                rows.AddRange(extra.Select(p => { var m = marks[p.Id]; return new AttendanceRowDto(p.Id, p.LastName, p.FirstName + " (выбыл)", 0, true, false, m.Present, m.Reason, m.Comment, 0); }));
+                rows.AddRange(extra.Select(p => { var m = marks[p.Id]; return new AttendanceRowDto(p.Id, p.LastName, p.FirstName + " (выбыл)", 0, true, false, m.Present, m.Reason, m.Comment, 0, ""); }));
             }
 
             return (new TrainingDetailsDto(t.Id, t.Kind, t.StartsAt, t.EndsAt, t.Status, t.GroupId, t.GroupName, t.OpponentName,

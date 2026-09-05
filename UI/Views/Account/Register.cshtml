@@ -70,7 +70,7 @@
                             </div>
                             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
-                        @* нужно убрать *@
+                        @* нужно убрать 
                         @if (Model.Roles != null && Model.Roles.Any())
                         {
                             <div class="mb-3">
@@ -87,11 +87,7 @@
                                                        id="role_@role.Name"
                                                        @(role.Name == "User" ? "checked" : "") />
                                                 <label class="form-check-label" for="role_@role.Name">
-                                                    <strong>@role.Description</strong>
-                                                    @* @if (!string.IsNullOrEmpty(role.Description))
-                                                    {
-                                                        <span class="text-muted ms-2">- @role.Description</span>
-                                                    } *@
+                                                    <strong>@role.Description</strong>                                                    
                                                 </label>
                                             </div>
                                         }
@@ -99,7 +95,7 @@
                                 </div>
                             </div>
                         }
-
+                        *@
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-user-plus"></i> Register

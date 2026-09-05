@@ -23,6 +23,9 @@
     }
 
     // ---------- таблица групп ----------
+    // Устанавливаем локализацию перед созданием таблицы
+    
+
     const table = new Tabulator('#groupsTable', {
         layout: 'fitColumns', selectable: 1,
         ajaxURL: '/api/groups',
@@ -50,7 +53,47 @@
                     if (act === 'unarchive') unarchive(d);
                 }
             }
-        ]
+        ],
+        locale: "ru-ru",
+        langs: {
+            "ru-ru": {
+                "pagination": {
+                    "page_size": "Строк на странице",
+                    "page_title": "Показать страницу",
+                    "first": "Первая",
+                    "first_title": "Первая страница",
+                    "last": "Последняя",
+                    "last_title": "Последняя страница",
+                    "prev": "Назад",
+                    "prev_title": "Предыдущая страница",
+                    "next": "Вперёд",
+                    "next_title": "Следующая страница",
+                    "all": "Все",
+                    "counter": {
+                        "showing": "Показано",
+                        "of": "из",
+                        "rows": "строк",
+                        "pages": "страниц"
+                    }
+                },
+                "headerFilters": {
+                    "default": "фильтр...",
+                    "columns": {}
+                },
+                "columns": {
+                    // переводы заголовков колонок по полю: "name": "Имя"
+                },
+                "data": {
+                    "loading": "Загрузка",
+                    "error": "Ошибка"
+                },
+                "groups": {
+                    "item": "элемент",
+                    "items": "элементов"
+                }
+            }
+
+        }
     });
     table.on('rowClick', (e, row) => { if (!e.target.closest('button')) showRoster(row.getData()); });
     let t; const refresh = () => { clearTimeout(t); t = setTimeout(() => table.setData(), 300); };

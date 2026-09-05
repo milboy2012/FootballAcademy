@@ -63,12 +63,16 @@ namespace UI.Controllers
 
                 if (!string.IsNullOrEmpty(returnUrl)) return RedirectToLocal(returnUrl);
 
-                var roles = await _userManager.GetRolesAsync(user);
-                if (roles.Contains("Player")) return RedirectToAction("Index", "My");
-                if (roles.Contains("Parent")) return RedirectToAction("Index", "Cabinet");
-                if (roles.Contains("Coach")) return RedirectToAction("Index", "Coach");
+                if (result.Succeeded)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Player")) return RedirectToAction("Index", "My");
+                    if (roles.Contains("Parent")) return RedirectToAction("Index", "Cabinet");
+                    if (roles.Contains("Coach")) return RedirectToAction("Index", "Coach");
+                }
+                
 
-                return RedirectToAction("Index", "Home");
+                //return RedirectToAction("Index", "Home");
 
                 if (result.Succeeded)
                 {

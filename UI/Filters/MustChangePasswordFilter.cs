@@ -9,7 +9,7 @@ namespace UI.Filters
     public class MustChangePasswordFilter : IAsyncActionFilter
     {
         private static readonly HashSet<string> Allowed = new(StringComparer.OrdinalIgnoreCase)
-        { "Account/ChangePassword", "Account/Logout", "Account/Login", "Account/AccessDenied" };
+        { "Account/ChangePassword", "Account/Logout", "Account/Login", "Account/AccessDenied", "Coach/Index", "Home/Index" };
 
         private readonly UserManager<AppUser> _userManager;
         public MustChangePasswordFilter(UserManager<AppUser> userManager) => _userManager = userManager;
@@ -28,7 +28,7 @@ namespace UI.Filters
                     if (!Allowed.Contains(key))
                     {
                         // Отдаём Home/Index с открытой модалкой, а не редиректим по кругу
-                        context.Result = new RedirectToActionResult("Index", "Home", null);
+                        context.Result = new RedirectToActionResult("Index", rd["controller"].ToString(), null);
                         return;
                     }
                 }
