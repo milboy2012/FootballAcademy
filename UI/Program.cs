@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UI.Filters;
+using UI.Models;
 using UI.Services;
 using UI.Services.Interfaces;
 using UI.Services.Options;
@@ -90,8 +91,10 @@ namespace UI
             builder.Services.AddScoped<ICoachTrainingService, CoachTrainingService>();
             builder.Services.AddScoped<IParentService, ParentService>();
             builder.Services.AddScoped<IPlayerCabinetService, PlayerCabinetService>();
+            builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-
+            builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+            builder.Services.AddHostedService<SubscriptionExpiryWorker>();
 
 
             // Настройка Identity с кастомными моделями
@@ -192,15 +195,18 @@ namespace UI
             });
 
 
+
+
             var app = builder.Build();
 
-            // Инициализация базы данных
+            // Инициализация пользователей базы данных
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ContextAuth>();
                 //await context.Database.MigrateAsync();
                 await DbInitializer.Initialize(services);
+                await DbInitializer.InitializeEntityDataAsync(services);
             }
 
 
@@ -208,6 +214,7 @@ namespace UI
             if (app.Environment.IsDevelopment())
             {
                 app.UseMigrationsEndPoint();
+                app.UseDeveloperExceptionPage();
             }
             else
             {

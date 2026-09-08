@@ -3,6 +3,7 @@ using Core.Enums;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using UI.Models.ViewModels.Coach;
+using UI.Models.ViewModels.Subscription;
 using UI.Services.Interfaces;
 
 namespace UI.Services
@@ -10,7 +11,12 @@ namespace UI.Services
     public class CoachTrainingService : ICoachTrainingService
     {
         private readonly IUoW _data;
-        public CoachTrainingService(IUoW data) => _data = data;
+        ISubscriptionService _subs;
+        public CoachTrainingService(IUoW data, ISubscriptionService subs)
+        {
+            _data = data;
+            _subs = subs;
+        }
 
         public Task<Guid?> GetCoachIdAsync(Guid userId, CancellationToken ct)
             => _data.Coaches.Query().Where(c => c.UserId == userId).Select(c => (Guid?)c.Id).FirstOrDefaultAsync(ct);
@@ -70,14 +76,29 @@ namespace UI.Services
                     Present = p.Attendances.Count(a => a.Training.GroupId == t.GroupId && a.TrainingId != trainingId && a.Present)
                 }).ToListAsync(ct);
 
-            var rows = players.Select(p =>
+            var rows = new List<AttendanceRowDto>();
+            foreach (var p in players)
             {
                 marks.TryGetValue(p.Id, out var m);
-                var age = today.Year - p.BirthDate.Year; if (p.BirthDate > today.AddYears(-age)) age--;
-                return new AttendanceRowDto(p.Id, p.LastName, p.FirstName, age,
-                    p.MedicalCertificateUntil is not null && p.MedicalCertificateUntil >= today, p.HasSub,
-                    m?.Present, m?.Reason, m?.Comment, p.Total == 0 ? 0 : p.Present * 100 / p.Total, "");
-            }).ToList();
+                var age = today.Year - p.BirthDate.Year;
+                if (p.BirthDate > today.AddYears(-age)) age--;
+
+                var status = await _subs.GetStatusAsync(p.Id, ct);
+
+                rows.Add(new AttendanceRowDto(p.Id, p.LastName, p.FirstName, age,
+                    p.MedicalCertificateUntil is not null && p.MedicalCertificateUntil >= today,
+                    status,
+                    m?.Present, m?.Reason, m?.Comment,
+                    p.Total == 0 ? 0 : p.Present * 100 / p.Total, ""));
+            }
+            //rows = players.Select(async p =>
+            //{
+            //    marks.TryGetValue(p.Id, out var m);
+            //    var age = today.Year - p.BirthDate.Year; if (p.BirthDate > today.AddYears(-age)) age--;
+            //    return new AttendanceRowDto(p.Id, p.LastName, p.FirstName, age,
+            //        p.MedicalCertificateUntil is not null && p.MedicalCertificateUntil >= today, await _subs.GetStatusAsync(p.Id, ct),
+            //        m?.Present, m?.Reason, m?.Comment, p.Total == 0 ? 0 : p.Present * 100 / p.Total, "");
+            //}).ToList();
 
             // игроки, которые были отмечены, но уже покинули группу — тоже показываем
             var gone = marks.Keys.Except(players.Select(p => p.Id)).ToList();
@@ -85,7 +106,13 @@ namespace UI.Services
             {
                 var extra = await _data.Players.Query().AsNoTracking().Where(p => gone.Contains(p.Id))
                     .Select(p => new { p.Id, p.LastName, p.FirstName }).ToListAsync(ct);
-                rows.AddRange(extra.Select(p => { var m = marks[p.Id]; return new AttendanceRowDto(p.Id, p.LastName, p.FirstName + " (выбыл)", 0, true, false, m.Present, m.Reason, m.Comment, 0, ""); }));
+                
+                foreach(var p in extra)
+                {
+                    var m = marks[p.Id];
+                    var sts = await _subs.GetStatusAsync(p.Id, ct);
+                    rows.Add(new AttendanceRowDto(p.Id, p.LastName, p.FirstName + " (выбыл)", 0, true, sts, m.Present, m.Reason, m.Comment, 0, ""));
+                }                
             }
 
             return (new TrainingDetailsDto(t.Id, t.Kind, t.StartsAt, t.EndsAt, t.Status, t.GroupId, t.GroupName, t.OpponentName,
@@ -104,14 +131,52 @@ namespace UI.Services
             if (dto.Attendance.Any(a => !allowed.Contains(a.PlayerId))) return "В списке есть игрок не из этой группы";
             if (dto.Attendance.GroupBy(a => a.PlayerId).Any(g => g.Count() > 1)) return "Игрок указан дважды";
 
+            var date = DateOnly.FromDateTime(t.StartsAt);
+            var blocked = new List<string>();
+
             foreach (var item in dto.Attendance)
             {
                 var a = t.Attendances.FirstOrDefault(x => x.PlayerId == item.PlayerId);
-                if (a is null) { a = new Attendance { TrainingId = t.Id, PlayerId = item.PlayerId }; t.Attendances.Add(a); }
+                var wasPresent = a?.Present == true;
+
+                if (item.Present && !wasPresent)
+                {
+                    var (sub, err) = await _subs.TryConsumeAsync(item.PlayerId, date, ct);
+                    if (sub is null)
+                    {
+                        var name = await _data.Players.Query()
+                            .Where(p => p.Id == item.PlayerId).Select(p => p.LastName + " " + p.FirstName).FirstAsync(ct);
+                        blocked.Add($"{name} — {err}");
+                        continue;                                   // отметку не сохраняем
+                    }
+                    a ??= NewRow(t, item.PlayerId);
+                    a.SubscriptionId = sub.Id;
+                }
+                else if (!item.Present && wasPresent)
+                {
+                    await _subs.RefundAsync(a!.SubscriptionId, ct);  // сняли присутствие — вернули занятие
+                    a.SubscriptionId = null;
+                }
+                a ??= NewRow(t, item.PlayerId);
                 a.Present = item.Present;
                 a.Reason = item.Present ? null : item.Reason ?? AbsenceReason.Unknown;
                 a.Comment = string.IsNullOrWhiteSpace(item.Comment) ? null : item.Comment.Trim();
             }
+
+            if (blocked.Count > 0)
+            {
+                //_data.ChangeTracker.Clear();     // ничего не сохраняем частично
+                return "Нельзя отметить присутствие (абонемент недействителен):\n" + string.Join("\n", blocked) + "\nОтметьте их как отсутствующих или попросите родителей продлить абонемент.";
+            }
+
+            //foreach (var item in dto.Attendance)
+            //{
+            //    var a = t.Attendances.FirstOrDefault(x => x.PlayerId == item.PlayerId);
+            //    if (a is null) { a = new Attendance { TrainingId = t.Id, PlayerId = item.PlayerId }; t.Attendances.Add(a); }
+            //    a.Present = item.Present;
+            //    a.Reason = item.Present ? null : item.Reason ?? AbsenceReason.Unknown;
+            //    a.Comment = string.IsNullOrWhiteSpace(item.Comment) ? null : item.Comment.Trim();
+            //}
 
             t.Summary = dto.Summary?.Trim();
             t.Highlights = dto.Highlights?.Trim();
@@ -124,6 +189,14 @@ namespace UI.Services
             }
             await _data.SaveChangesAsync(ct);
             return null;
+        }
+
+        private Attendance? NewRow(Training t, Guid playerId)
+        {
+            Attendance attendance = new Attendance();
+            attendance.PlayerId = playerId;
+            t.Attendances.Add(attendance);
+            return attendance;
         }
 
         private IQueryable<Training> MyTrainings(Guid coachId) => _data.Trainings.Query().Where(t => t.Group.CoachId == coachId || (t.OpponentGroup != null && t.OpponentGroup.CoachId == coachId));

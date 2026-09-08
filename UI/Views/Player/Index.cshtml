@@ -6,12 +6,13 @@
 
 @{
     ViewData["Title"] = "Ученики";
-    var isStaff = User.IsInRole("Admin") || User.IsInRole("Coach");
-    var isAdmin = User.IsInRole("Admin");
+    var isStaff = User.IsInRole("Manager") || User.IsInRole("Coach");
+    var isAdmin = User.IsInRole("Manager");
 }
 
 @section Styles {
-    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+    @* <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" /> *@
+    <link href="~/css/tabulator-tables@6.3.0/tabulator_bootstrap5.min.css" rel="stylesheet" />
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">

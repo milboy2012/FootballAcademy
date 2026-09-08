@@ -1,0 +1,82 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Абонементы";
+}
+@section Styles {
+    <link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Абонементы и оплата</h2>
+    <a class="btn btn-outline-secondary" href="/Plans"><i class="bi bi-tags"></i> Тарифы</a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body py-2"><div class="fs-3 fw-bold text-warning" id="cPending">–</div><div class="text-muted small">ожидают подтверждения</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body py-2"><div class="fs-3 fw-bold text-success" id="cActive">–</div><div class="text-muted small">активных</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body py-2"><div class="fs-3 fw-bold text-danger" id="cExpiring">–</div><div class="text-muted small">истекают за 7 дней</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body py-2"><div class="fs-3 fw-bold" id="cRevenue">–</div><div class="text-muted small">оплат за месяц</div></div></div></div>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-4">
+        <div class="btn-group w-100" role="group" id="statusFilter">
+            <input type="radio" class="btn-check" name="st" id="stPending" value="PendingPayment" checked><label class="btn btn-outline-warning" for="stPending">Ожидают</label>
+            <input type="radio" class="btn-check" name="st" id="stActive" value="Active"><label class="btn btn-outline-success" for="stActive">Активные</label>
+            <input type="radio" class="btn-check" name="st" id="stOther" value="other"><label class="btn btn-outline-secondary" for="stOther">Прочие</label>
+            <input type="radio" class="btn-check" name="st" id="stAll" value=""><label class="btn btn-outline-dark" for="stAll">Все</label>
+        </div>
+    </div>
+    <div class="col-md-4"><input id="fSearch" class="form-control" placeholder="Фамилия ребёнка или родителя" /></div>
+</div>
+
+<div id="subsTable"></div>
+
+<!-- Подтверждение оплаты -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="confirmForm" novalidate>
+            <div class="modal-header"><h5 class="modal-title">Подтверждение оплаты</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <dl class="row small mb-3" id="confirmInfo"></dl>
+                <div class="row g-2">
+                    <div class="col-6"><label class="form-label">Сумма, ₽ *</label><input name="amount" type="number" step="0.01" min="1" class="form-control" required /></div>
+                    <div class="col-6">
+                        <label class="form-label">Способ оплаты</label>
+                        <select name="method" class="form-select"><option value="2">Перевод</option><option value="1">Карта</option><option value="0">Наличные</option></select>
+                    </div>
+                    <div class="col-12"><label class="form-label">Комментарий</label><input name="comment" class="form-control" placeholder="№ платёжки, примечание" /></div>
+                </div>
+                <div class="alert alert-danger mt-3 d-none" id="confirmErr"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" id="btnReject">Отклонить заявку</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-success">Подтвердить оплату</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Продление -->
+<div class="modal fade" id="extendModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <form class="modal-content" id="extendForm" novalidate>
+            <div class="modal-header"><h5 class="modal-title">Продлить срок</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="small text-muted mb-2" id="extendInfo"></div>
+                <label class="form-label">Новая дата окончания *</label><input name="newTo" type="date" class="form-control" required />
+                <label class="form-label mt-2">Причина</label><input name="comment" class="form-control" placeholder="Компенсация за заморозку" />
+                <div class="alert alert-danger mt-3 d-none" id="extendErr"></div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button><button type="submit" class="btn btn-primary">Сохранить</button></div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script src="~/js/subscriptions.js" asp-append-version="true"></script>
+}

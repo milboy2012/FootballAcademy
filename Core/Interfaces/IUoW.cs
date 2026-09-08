@@ -22,6 +22,7 @@ namespace Core.Interfaces
         IRepo<SkillScore> SkillScores { get; }
         IRepo<Subscription> Subscriptions{ get; }
         IRepo<Training> Trainings{ get; }        
+        IRepo<TrainingPlan> TrainingPlans{ get; }        
         IRepo<Venue> Venues{ get; }
 
         //IRepo<AppUser> Users{ get; }

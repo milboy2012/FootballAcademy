@@ -49,7 +49,7 @@
                             @(c.MedicalUntil?.ToString("dd.MM.yyyy") ?? "не загружена")
                         </dd>
                         <dt class="col-5">Абонемент</dt>
-                        <dd class="col-7">
+                        @* <dd class="col-7">
                             @if (c.ActiveSubscriptionUntil is not null)
                             {
                                 <span class="text-success">до @c.ActiveSubscriptionUntil?.ToString("dd.MM.yyyy")</span>
@@ -59,7 +59,13 @@
 
                                 <span class="text-warning">не оплачен</span>
                             }
+                        </dd> *@
+                        <dt class="col-5">Абонемент</dt>
+                        <dd class="col-7">
+                            <span class="@(c.Subscription.IsValid ? "text-success" : c.Subscription.HasPending ? "text-warning" : "text-danger")">@c.Subscription.Text</span>
+                            <div><button class="btn btn-sm btn-link p-0" data-sub="@c.Id" data-name="@c.FullName">@(c.Subscription.IsValid ? "продлить / история" : c.Subscription.HasPending ? "заявка" : "оплатить")</button></div>
                         </dd>
+
                         <dt class="col-5">Ближайшая тренировка</dt>
                         <dd class="col-7">@(c.NextTraining?.ToLocalTime().ToString("dd.MM HH:mm") ?? "—")</dd>
 
@@ -68,7 +74,7 @@
                         <dd class="col-7">
                             @if (c.Login is null)
                             {
-                                <button class="btn btn-sm btn-outline-success py-0" data-create-account="@c.Id">Создать</button>
+                                <button class="btn btn-sm btn-outline-success py-0" data-create-account="@c.Id" id="btnLogin">Создать</button>
                             }
                             else
                             {
@@ -133,6 +139,30 @@
                 <small class="text-muted">Сохраните пароль — повторно он не показывается. Ребёнок входит на странице «Вход», указывая логин вместо email.</small>
             </div>
             <div class="modal-footer"><button class="btn btn-primary" data-bs-dismiss="modal" onclick="location.reload()">Готово</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="subModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="subTitle">Абонемент</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="alert" id="subStatus"></div>
+                <div id="pendingBox" class="d-none alert alert-warning">Заявка отправлена. Оплатите по реквизитам академии и дождитесь подтверждения менеджера. <a href="#" id="btnCancelReq">Отменить заявку</a></div>
+                <div id="chooseBox">
+                    <h6>Выбрать план обучения</h6>
+                    <div class="row g-2" id="plans"></div>
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-4"><label class="form-label">Начать с</label><input type="date" id="subFrom" class="form-control" /></div>
+                        <div class="col-md-8"><label class="form-label">Комментарий (как/когда оплатили)</label><input id="subComment" class="form-control" /></div>
+                    </div>
+                    <button class="btn btn-primary mt-3" id="btnRequest" disabled>Отправить заявку</button>
+                    <div class="alert alert-danger mt-2 d-none" id="subErr"></div>
+                </div>
+                <h6 class="mt-4">История</h6>
+                <table class="table table-sm"><thead><tr><th>План</th><th>Период</th><th>Занятия</th><th>Сумма</th><th>Статус</th></tr></thead><tbody id="subHistory"></tbody></table>
+            </div>
         </div>
     </div>
 </div>

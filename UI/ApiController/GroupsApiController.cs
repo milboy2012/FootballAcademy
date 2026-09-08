@@ -43,11 +43,29 @@ namespace UI.ApiController
         public async Task<IActionResult> AssignCoach(Guid id, Guid coachId, CancellationToken ct) => R(await _svc.AssignCoachAsync(id, coachId, ct));
 
         [HttpGet("{id:guid}/players")]
-        public async Task<IActionResult> Players(Guid id, CancellationToken ct) => Ok(new { data = await _svc.GetPlayersAsync(id, ct) });
+        public async Task<IActionResult> Players(Guid id, CancellationToken ct)
+        {
+
+            //return Ok(new { data = await _svc.GetPlayersAsync(id, ct) });
+            var data = await _svc.GetPlayersAsync(id, ct);
+            return Ok(data);
+        }
+        [HttpGet("playerswithoutgroup")]
+        public async Task<IActionResult> PlayersWithOutGroup(Guid id, CancellationToken ct)
+        {
+
+            //return Ok(new { data = await _svc.GetPlayersAsync(id, ct) });
+            var data = await _svc.GetPlayersWithOutGroupAsync(id, ct);
+            var res = data.Where(s => s.HasActiveSubscription == true).ToList();
+            return Ok(res);
+        }
 
         /// <summary>Перевод в другую группу или отчисление (targetGroupId = null).</summary>
         [HttpPost("{id:guid}/players/move")]
-        public async Task<IActionResult> Move(Guid id, MovePlayersDto dto, CancellationToken ct) => R(await _svc.MovePlayersAsync(id, dto, ct));
+        public async Task<IActionResult> Move(Guid id, [FromBody]MovePlayersDto dto, CancellationToken ct) => R(await _svc.MovePlayersAsync(id, dto, ct));
+
+        [HttpPost("{id:guid}/players/add")]
+        public async Task<IActionResult> Add(Guid id, [FromBody] MovePlayersDto dto, CancellationToken ct) => R(await _svc.AddPlayersToGroupAsync(id, dto, ct));
 
         [HttpPost("{id:guid}/archive")]
         public async Task<IActionResult> Archive(Guid id, [FromQuery] Guid? moveTo, CancellationToken ct) => R(await _svc.ArchiveAsync(id, true, moveTo, ct));

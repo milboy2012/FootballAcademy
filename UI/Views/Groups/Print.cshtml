@@ -1,0 +1,160 @@
+﻿@using UI.Models.ViewModels.Group
+@model GroupPrintVm
+@{
+    Layout = null;
+    string mode = ViewBag.Mode; int weeks = ViewBag.Weeks;
+    bool journal = mode == "journal";
+    int cols = weeks * 2; // 2 тренировки в неделю — подстройте под расписание
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.Group.Name — @(journal ? "Журнал посещаемости" : "Список группы")</title>
+    <style>
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                margin: 15mm;
+            }
+
+            h1 {
+                font-size: 18px;
+                margin: 0 0 4px;
+            }
+
+            .sub {
+                color: #555;
+                margin-bottom: 12px;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th, td {
+                border: 1px solid #000;
+                padding: 4px 6px;
+            }
+
+            th {
+                background: #eee;
+            }
+
+            td.c {
+                text-align: center;
+            }
+
+            .cell {
+                width: 22px;
+                height: 22px;
+            }
+
+            .warn {
+                color: #b00;
+            }
+
+            .foot {
+                margin-top: 18px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            @@media print {
+                .noprint {
+                    display: none;
+                }
+
+                @@page {
+                    size: @(journal ? "landscape" : "portrait");
+                    margin: 10mm;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="noprint" style="margin-bottom:10px">
+        <button onclick="print()">Печать</button>
+        @if (journal)
+        {
+            <span> Недель: <a href="?mode=journal&weeks=4">4</a> · <a href="?mode=journal&weeks=8">8</a> · <a href="?mode=journal&weeks=12">12</a></span>
+        }
+    </div>
+
+    <h1>Группа @Model.Group.Name @(Model.Group.Season is null ? "" : $"· сезон {Model.Group.Season}")</h1>
+    <div class="sub">
+        Тренер: @Model.Group.CoachName · Годы рождения: @Model.Group.MinBirthYear–@Model.Group.MaxBirthYear
+        · Игроков: @Model.Players.Count/@Model.Group.MaxPlayers · Сформировано @DateTime.Now.ToString("dd.MM.yyyy")
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:28px">№</th>
+                <th>Фамилия, имя</th>
+                <th style="width:80px">Дата рожд.</th>
+                @if (journal)
+                {
+                    <th style="width:70px">Справка</th>
+                    @for (int i = 1; i <= cols; i++)
+                    {
+                        <th class="cell"></th>
+                    }
+                }
+                else
+                {
+                    <th>Родитель</th>
+                    <th style="width:120px">Телефон</th>
+                    <th style="width:90px">Справка до</th>
+                    <th style="width:70px">Абонемент</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int n = 0;
+            }
+            @foreach (var p in Model.Players)
+            {
+                n++;
+                <tr>
+                    <td class="c">@n</td>
+                    <td>@p.LastName @p.FirstName</td>
+                    <td class="c">@p.BirthDate.ToString("dd.MM.yyyy")</td>
+                    @if (journal)
+                    {
+                        <td class="c @(p.MedicalValid ? "" : "warn")">@(p.MedicalValid ? "✓" : "нет")</td>
+                        @for (int i = 0; i < cols; i++)
+                        {
+                            <td class="cell"></td>
+                        }
+                    }
+                    else
+                    {
+                        <td>@p.ParentName</td>
+                        <td>@p.ParentPhone</td>
+                        <td class="c @(p.MedicalValid ? "" : "warn")">@(p.MedicalUntil?.ToString("dd.MM.yyyy") ?? "нет")</td>
+                        <td class="c">@(p.HasActiveSubscription ? "да" : "нет")</td>
+                    }
+                </tr>
+            }
+            @if (journal)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    <tr><td class="c">@(++n)</td><td></td><td></td><td></td>@for (int i = 0; i < cols; i++) {
+                        <td class="cell"></td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@if (journal)
+{
+    <div class="foot"><span>Даты тренировок: ____________________________________________</span><span>Подпись тренера: ______________</span></div>
+}
+</body>
+</html>

@@ -11,7 +11,9 @@ namespace UI.Services.Interfaces
         Task<string?> UpdateAsync(Guid id, GroupEditDto dto, CancellationToken ct);
         Task<string?> AssignCoachAsync(Guid id, Guid coachId, CancellationToken ct);
         Task<List<GroupPlayerDto>> GetPlayersAsync(Guid id, CancellationToken ct);
+        Task<List<GroupPlayerDto>> GetPlayersWithOutGroupAsync(Guid id, CancellationToken ct);
         Task<string?> MovePlayersAsync(Guid id, MovePlayersDto dto, CancellationToken ct);
+        Task<string?> AddPlayersToGroupAsync(Guid id, MovePlayersDto dto, CancellationToken ct);
         Task<string?> ArchiveAsync(Guid id, bool archive, Guid? moveTo, CancellationToken ct);
         Task<List<CoachLookupDto>> GetCoachesAsync(CancellationToken ct);
     }

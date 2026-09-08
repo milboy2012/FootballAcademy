@@ -28,6 +28,7 @@ namespace Core
         private IGenericRepo<Subscription> _subscription;        
         private IGenericRepo<Training> _trainig;
         private IGenericRepo<TrainingGroup> _trainigGroup;
+        private IGenericRepo<TrainingPlan> _trainigPlan;
         private IGenericRepo<Venue> _venue;
 
 
@@ -81,6 +82,10 @@ namespace Core
         public IRepo<TrainingGroup> Groups
         {
             get { return _trainigGroup ??= new GenericRepo<TrainingGroup>(_context); }
+        }
+        public IRepo<TrainingPlan> TrainingPlans
+        {
+            get { return _trainigPlan ??= new GenericRepo<TrainingPlan>(_context); }
         }
         public IRepo<Venue> Venues
         {

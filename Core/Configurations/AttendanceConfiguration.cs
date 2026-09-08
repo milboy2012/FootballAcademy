@@ -20,6 +20,9 @@ namespace Core.Configurations
                 .HasForeignKey(a => a.TrainingId).OnDelete(DeleteBehavior.Cascade);
             b.HasOne(a => a.Player).WithMany(p => p.Attendances)
                 .HasForeignKey(a => a.PlayerId).OnDelete(DeleteBehavior.Cascade);
+            b.HasOne(a => a.Subscription).WithMany(p => p.Attendances)
+                .HasForeignKey(a => a.SubscriptionId).OnDelete(DeleteBehavior.Restrict);
+
 
             b.HasIndex(a => new { a.TrainingId, a.PlayerId }).IsUnique();
         }

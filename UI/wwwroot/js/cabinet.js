@@ -6,6 +6,9 @@
     const showError = m => { errBox.textContent = m; errBox.classList.remove('d-none'); };
     const reset = () => { form.reset(); form.classList.remove('was-validated'); errBox.classList.add('d-none'); };
 
+    const STATUS = { PendingPayment: ['ожидает оплаты', 'warning'], Active: ['активен', 'success'], Expired: ['истёк', 'secondary'], Frozen: ['заморожен', 'info'], Cancelled: ['отменён', 'danger'] };
+    const subModal = new bootstrap.Modal('#subModal'); let subPlayer = null, plans = [], chosenPlan = null, pendingId = null;
+
     document.getElementById('btnAdd').addEventListener('click', () => {
         reset();
         form.id.value = '';
@@ -52,6 +55,106 @@
         showError(body?.error ?? body?.title ?? `Ошибка ${r.status}`);
     });
 
+    //Работа с подпиской
+    async function openSub(playerId, name) {
+        subPlayer = playerId;
+        chosenPlan = null;
+        //$('subTitle').textContent = `Абонемент — ${name}`;
+
+        var subTitle = document.getElementById('subTitle');
+        subTitle.textContent = `Абонемент — ${name}`;
+        if (!plans.length)
+            plans = await (await fetch('/api/subscriptions/plans')).json();
+
+        const d = await (await fetch(`/api/subscriptions/player/${playerId}`)).json();
+        var subStatus = document.getElementById('subStatus');
+        subStatus.className = `alert alert-${d.status.isValid ? 'success' : d.status.hasPending ? 'warning' : 'danger'}`;
+
+        var subStatus = document.getElementById('subStatus');
+        subStatus.textContent = d.status.text;
+
+        pendingId = d.history.find(h => h.status === 'PendingPayment')?.id ?? null;
+
+        //$('pendingBox').classList.toggle('d-none', !pendingId); 
+        //$('chooseBox').classList.toggle('d-none', !!pendingId);
+        var penBox = document.getElementById('pendingBox');
+        penBox.classList.toggle('d-none', !pendingId);
+
+        var chooseBox = document.getElementById('chooseBox');
+        chooseBox.classList.toggle('d-none', !!pendingId);
+        var pl = document.getElementById('plans');
+        pl.innerHTML = plans.map(p =>
+            `<div class="col-md-3">
+                <div class="card plan h-100" data-plan="${p.id}" style="cursor:pointer">
+                    <div class="card-body text-center">
+                        <div class="fw-bold">${p.name}</div>
+                        <div class="fs-4">${p.price.toLocaleString('ru-RU')} ₽</div>
+                        <small class="text-muted">${p.type === 'Visits' ? `${p.visits} занятий, действуют ${p.visitsValidDays} дн.` : 'безлимит на период'}</small>
+                        ${p.description ? `<div class="small mt-1">${p.description}</div>` : ''}
+                    </div>
+                </div>
+            </div>`)
+            .join('');
+
+        document.querySelectorAll('.plan').forEach(c => c.addEventListener('click', () => {
+            document.querySelectorAll('.plan').forEach(x => x.classList.remove('border-primary', 'border-2'));
+            c.classList.add('border-primary', 'border-2');
+            chosenPlan = c.dataset.plan;
+
+            var btnRequest = document.getElementById('btnRequest');
+            btnRequest.disabled = false;
+        }));
+
+        // $('subFrom').value = ''; 
+        // $('subComment').value = ''; 
+        // $('btnRequest').disabled = true; 
+        var subForm = document.getElementById('subFrom');
+        var subComment = document.getElementById('subComment');
+        var btnRequest = document.getElementById('btnRequest');
+        subForm.value = '';
+        subComment.value = '';
+        btnRequest.disabled = true;
+
+        //$('subErr').classList.add('d-none');
+        var subErr = document.getElementById('subErr');
+        subErr.classList.add('d-none');
+        var subHistory = document.getElementById('subHistory');
+        subHistory.innerHTML = d.history.map(h => {
+            const [t, c] = STATUS[h.status];
+            return `<tr>
+                        <td>${h.planName}</td>
+                        <td>${new Date(h.from).toLocaleDateString('ru-RU')} – ${new Date(h.to).toLocaleDateString('ru-RU')}</td>
+                        <td>${h.trainingsLimit == null ? '∞' : `${h.trainingsUsed}/${h.trainingsLimit}`}</td><td>${h.price.toLocaleString('ru-RU')} ₽</td>
+                        <td><span class="badge bg-${c}">${t}</span>${h.managerComment ? `<br><small class="text-muted">${h.managerComment}</small>` : ''}</td>
+                    </tr>`;
+        }).join('') || '<tr><td colspan="5" class="text-muted">Пока нет</td></tr>';
+
+        subModal.show();
+    }
+
+    document.querySelectorAll('[data-sub]').forEach(b => b.addEventListener('click', () => openSub(b.dataset.sub, b.dataset.name)));
+    var btnRequest = document.getElementById('btnRequest');
+    btnRequest.addEventListener('click', async () => {
+        const r = await post('/api/subscriptions/request', {
+            playerId: subPlayer,
+            planId: chosenPlan,
+            startFrom: document.getElementById('subFrom').value || null,
+            comment: document.getElementById('subComment').value || null
+        });
+        if (!r.ok) {
+
+            document.getElementById('subErr').textContent = (await r.json().catch(() => null))?.error ?? 'Ошибка';
+            document.getElementById('subErr').classList.remove('d-none');
+            return;
+        }
+        location.reload();
+    });
+    var btnCancelReq = document.getElementById('btnCancelReq');
+    btnCancelReq.addEventListener('click', async e => {
+        e.preventDefault();
+        if (!confirm('Отменить заявку?')) return;
+        const r = await fetch(`/api/subscriptions/request/${pendingId}`, { method: 'DELETE' }); r.ok ? location.reload() : fail(r);
+    });
 
     const creds = new bootstrap.Modal(document.getElementById('credsModal'));
     const showCreds = (login, password) => {

@@ -20,5 +20,9 @@ namespace Core.Entity
         public string? Comment { get; set; }
         public AbsenceReason? Reason { get; set; }  // null если присутствовал
 
+        public Guid? SubscriptionId { get; set; }
+        public Subscription? Subscription { get; set; }
+
+
     }
 }

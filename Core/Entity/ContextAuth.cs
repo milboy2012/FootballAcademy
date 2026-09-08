@@ -33,6 +33,7 @@ namespace Core.Entity
         public DbSet<SkillScore> SkillScores => Set<SkillScore>();
         public DbSet<Subscription> Subscriptions => Set<Subscription>();
         public DbSet<Training> Trainings => Set<Training>();
+        public DbSet<TrainingPlan> TrainingPlans => Set<TrainingPlan>();
         public DbSet<TrainingGroup> Groups => Set<TrainingGroup>();
         public DbSet<Venue> Venues => Set<Venue>();
 

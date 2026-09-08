@@ -66,9 +66,9 @@ namespace UI.Controllers
                 if (result.Succeeded)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains("Player")) return RedirectToAction("Index", "My");
+                    if (roles.Contains("Player")) return RedirectToAction("PlayerCab", "My");
                     if (roles.Contains("Parent")) return RedirectToAction("Index", "Cabinet");
-                    if (roles.Contains("Coach")) return RedirectToAction("Index", "Coach");
+                    if (roles.Contains("Coach")) return RedirectToAction("CoachTraining", "Coach");
                 }
                 
 

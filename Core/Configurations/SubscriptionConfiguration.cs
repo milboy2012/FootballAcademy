@@ -21,6 +21,8 @@ namespace Core.Configurations
                 .HasForeignKey(s => s.PlayerId).OnDelete(DeleteBehavior.Cascade);
 
             b.HasIndex(s => new { s.PlayerId, s.To });
+            b.HasIndex(s => new { s.PlayerId, s.Status});
+            b.HasIndex(s => new { s.Status, s.To});            
         }
     }
 }

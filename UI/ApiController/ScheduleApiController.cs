@@ -16,7 +16,7 @@ namespace UI.ApiController
         private readonly IScheduleService _svc;
         public ScheduleApiController(IScheduleService svc) => _svc = svc;
 
-        private bool IsManager => User.IsInRole("Admin") || User.IsInRole("Manager");
+        private bool IsManager => User.IsInRole("Manager");
 
         /// <summary>FullCalendar: ?start=...&end=... (ISO). Менеджер видит всё, остальные — свои группы.</summary>
         [HttpGet]
@@ -28,12 +28,12 @@ namespace UI.ApiController
         }
 
         [HttpPost("check")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Check([FromQuery] Guid? selfId, EventEditDto dto, CancellationToken ct)
             => Ok(await _svc.CheckAsync(selfId, dto.Kind, dto.GroupId, dto.OpponentGroupId, dto.VenueId, dto.Start.UtcDateTime, dto.End.UtcDateTime, ct));
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create(EventEditDto dto, CancellationToken ct)
         {
             var (result, error, conflicts) = await _svc.CreateAsync(dto, ct);
@@ -43,15 +43,15 @@ namespace UI.ApiController
         }
 
         [HttpPut("{id:guid}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Update(Guid id, EventEditDto dto, CancellationToken ct) => R(await _svc.UpdateAsync(id, dto, ct));
 
         [HttpPatch("{id:guid}/move")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Move(Guid id, MoveDto dto, CancellationToken ct) => R(await _svc.MoveAsync(id, dto, ct));
 
         [HttpPost("{id:guid}/cancel")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Cancel(Guid id, CancelDto dto, CancellationToken ct)
         {
             var e = await _svc.CancelAsync(id, dto, ct);

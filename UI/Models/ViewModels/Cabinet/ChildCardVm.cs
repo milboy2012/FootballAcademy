@@ -1,4 +1,6 @@
-﻿namespace UI.Models.ViewModels.Cabinet
+﻿using UI.Models.ViewModels.Subscription;
+
+namespace UI.Models.ViewModels.Cabinet
 {
     public class ChildCardVm
     {
@@ -9,7 +11,8 @@
         public string? CoachName { get; set; }
         public DateOnly? MedicalUntil { get; set; }
         public bool IsActive { get; set; }
-        public DateOnly? ActiveSubscriptionUntil { get; set; }
+        //public DateOnly? ActiveSubscriptionUntil { get; set; }
+        public SubscriptionStatusDto Subscription { get; set; }
         public DateTime? NextTraining { get; set; }
         public string? Login { get; set; }
         public bool? AccountActive { get; set; }

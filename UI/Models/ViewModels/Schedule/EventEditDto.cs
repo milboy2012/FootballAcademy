@@ -1,9 +1,11 @@
 ﻿using Core.Enums;
+using System.Text.Json.Serialization;
 
 namespace UI.Models.ViewModels.Schedule
 {
     public class EventEditDto
     {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public EventKind Kind { get; set; } = EventKind.Training;
         public Guid GroupId { get; set; }
         public Guid? OpponentGroupId { get; set; }

@@ -8,9 +8,10 @@ namespace Core.Enums
 {
     public enum SubscriptionStatus
     {
-        Active = 0,
-        Expired = 1,
-        Frozen = 2,
-        Cancelled = 3
+        PendingPayment = 0,   // заявка создана родителем
+        Active = 1,           // оплата подтверждена
+        Expired = 2,          // срок вышел / занятия закончились
+        Frozen = 3,
+        Cancelled = 4         // отклонена / отменена
     }
 }

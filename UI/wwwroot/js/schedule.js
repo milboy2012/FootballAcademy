@@ -8,6 +8,8 @@
     const dateOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     const timeOf = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
+    
+
     let groups = [], venues = [];
 
     async function loadLookups() {
@@ -67,15 +69,29 @@
     function syncKind() { $('oppWrap').style.display = kindIsMatch() ? '' : 'none'; $('recWrap').style.display = kindIsMatch() || editing ? 'none' : ''; if (kindIsMatch()) $('recOn').checked = false, $('recBody').style.display = 'none'; }
     $('recOn').addEventListener('change', () => $('recBody').style.display = $('recOn').checked ? '' : 'none');
 
-    function reset() { form.reset(); form.classList.remove('was-validated'); err.classList.add('d-none'); conf.classList.add('d-none'); document.querySelectorAll('#weekdays input').forEach(c => c.checked = false); }
+    function reset() {
+        form.reset();
+        form.classList.remove('was-validated');
+        err.classList.add('d-none');
+        conf.classList.add('d-none');
+        document.querySelectorAll('#weekdays input').forEach(c => c.checked = false);
+    }
+
     function openCreate(start, end) {
-        editing = null; reset();
-        $('evTitle').textContent = 'Новое событие'; $('btnCancelEv').classList.add('d-none');
+        editing = null;
+        reset();
+        $('evTitle').textContent = 'Новое событие';
+        $('btnCancelEv').classList.add('d-none');
         const s = start ?? new Date(), e = end ?? new Date(s.getTime() + 90 * 60000);
-        form.date.value = dateOf(s); form.startTime.value = timeOf(s); form.endTime.value = timeOf(e);
-        const until = new Date(s); until.setMonth(until.getMonth() + 3); form.until.value = dateOf(until);
+        form.date.value = dateOf(s);
+        form.startTime.value = timeOf(s);
+        form.endTime.value = timeOf(e);
+        const until = new Date(s);
+        until.setMonth(until.getMonth() + 3);
+        form.until.value = dateOf(until);
         $(`wd${s.getDay()}`).checked = true;
-        syncKind(); modal.show();
+        syncKind();
+        modal.show();
     }
     function openEdit(ev) {
         editing = ev; reset(); const p = ev.extendedProps;
@@ -88,20 +104,44 @@
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        if (!form.checkValidity()) return form.classList.add('was-validated');
-        err.classList.add('d-none'); conf.classList.add('d-none');
+        if (!form.checkValidity())
+            return form.classList.add('was-validated');
+
+        err.classList.add('d-none');
+        conf.classList.add('d-none');
+        
         const dto = {
-            kind: form.kind.value, groupId: form.groupId.value, opponentGroupId: kindIsMatch() ? form.opponentGroupId.value || null : null,
-            venueId: form.venueId.value, start: toIso(form.date.value, form.startTime.value), end: toIso(form.date.value, form.endTime.value),
-            note: form.note.value || null, notifyParticipants: $('notifyOn').checked, skipConflicts: $('skipConf').checked,
+            kind: form.kind.value,
+            groupId: form.groupId.value,
+            opponentGroupId: kindIsMatch() ? form.opponentGroupId.value || null : null,
+            venueId: form.venueId.value,
+            start: toIso(form.date.value, form.startTime.value),
+            end: toIso(form.date.value, form.endTime.value),
+            note: form.note.value || null,
+            notifyParticipants: $('notifyOn').checked,
+            skipConflicts: $('skipConf').checked,
             recurrence: !editing && $('recOn').checked ? { weekdays: [...document.querySelectorAll('#weekdays input:checked')].map(c => +c.value), until: form.until.value } : null
         };
+        console.log(dto);
         const r = await json(editing ? `/api/schedule/${editing.id}` : '/api/schedule', editing ? 'PUT' : 'POST', dto);
+        //для перехвата ошибок    
+        if (!r.ok) console.error(r.status, await r.text());
+
         const body = await r.json().catch(() => null);
-        if (r.status === 409) { conf.innerHTML = conflictsText(body.conflicts).replace(/\n/g, '<br>') + (dto.recurrence ? '<br><small>Включите «Пропускать занятые слоты», чтобы создать остальные.</small>' : ''); conf.classList.remove('d-none'); return; }
-        if (!r.ok) { err.textContent = body?.error ?? `Ошибка ${r.status}`; err.classList.remove('d-none'); return; }
+        if (r.status === 409) {
+            conf.innerHTML = conflictsText(body.conflicts).replace(/\n/g, '<br>') + (dto.recurrence ? '<br><small>Включите «Пропускать занятые слоты», чтобы создать остальные.</small>' : ''); conf.classList.remove('d-none');
+            return;
+        }
+
+        if (!r.ok) {
+            err.textContent = body?.error ?? `Ошибка ${r.status}`;
+            err.classList.remove('d-none');
+            return;
+        }
+
         modal.hide(); calendar.refetchEvents();
-        if (body?.skipped?.length) alert(`Создано: ${body.created}. Пропущено из-за занятости: ${body.skipped.length}`);
+        if (body?.skipped?.length)
+            alert(`Создано: ${body.created}. Пропущено из-за занятости: ${body.skipped.length}`);
     });
 
     // ---------- отмена ----------

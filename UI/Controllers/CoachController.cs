@@ -5,11 +5,14 @@ using UI.Models.ViewModels.Player;
 
 namespace UI.Controllers
 {
-    [Authorize(Roles = "Coach, Manager")]
+    
     public class CoachController : Controller
     {
+        [Authorize(Roles = "Manager")]
         public ActionResult Index() => View();
-        public ActionResult CoachTrainig() => View();
+        [Authorize(Roles = "Coach")]
+        public ActionResult CoachTraining() => View();
+        [Authorize(Roles = "Manager, Coach")]
         public ActionResult Training(Guid id) => View(id);
         
 

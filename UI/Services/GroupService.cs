@@ -56,7 +56,7 @@ namespace UI.Services
         {
             if (await ValidateAsync(null, dto, ct) is { } e) return (null, e);
             var g = new TrainingGroup(); Apply(g, dto);
-            _data.Groups.AddAsync(g,ct); 
+            await _data.Groups.AddAsync(g,ct); 
             await _data.SaveChangesAsync(ct);
             return (g.Id, null);
         }
@@ -85,12 +85,49 @@ namespace UI.Services
             g.CoachId = coachId; await _data.SaveChangesAsync(ct);
             return null;
         }
-
+        /// <summary>
+        /// список всех игроков
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         public async Task<List<GroupPlayerDto>> GetPlayersAsync(Guid id, CancellationToken ct)
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var rows = await _data.Players.Query().AsNoTracking()
                 .Where(p => p.GroupId == id)
+                .OrderBy(p => p.LastName).ThenBy(p => p.FirstName)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.LastName,
+                    p.FirstName,
+                    p.BirthDate,
+                    p.MedicalCertificateUntil,
+                    ParentName = p.Parent.LastName + " " + p.Parent.FirstName,
+                    ParentPhone = p.Parent.PhoneNumber,
+                    HasSub = p.Subscriptions.Any(s => s.Status == SubscriptionStatus.Active && s.To >= today),
+                    Total = p.Attendances.Count(a => a.Training.GroupId == id),
+                    Present = p.Attendances.Count(a => a.Training.GroupId == id && a.Present)
+                }).ToListAsync(ct);
+
+            return rows.Select(r => new GroupPlayerDto(r.Id, r.LastName, r.FirstName, r.BirthDate, Age(r.BirthDate, today),
+                r.ParentName, r.ParentPhone, r.MedicalCertificateUntil,
+                r.MedicalCertificateUntil is not null && r.MedicalCertificateUntil >= today,
+                r.HasSub, r.Total == 0 ? 0 : r.Present * 100 / r.Total)).ToList();
+        }
+
+        /// <summary>
+        /// Список игроков без группы
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<List<GroupPlayerDto>> GetPlayersWithOutGroupAsync(Guid id, CancellationToken ct)
+        {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var rows = await _data.Players.Query().AsNoTracking()
+                .Where(p => p.GroupId == null)
                 .OrderBy(p => p.LastName).ThenBy(p => p.FirstName)
                 .Select(p => new
                 {
@@ -132,6 +169,24 @@ namespace UI.Services
 
             foreach (var p in players) p.GroupId = dto.TargetGroupId;
             await _data.SaveChangesAsync(ct);
+            return null;
+        }
+        /// <summary>Добавляем игрока в группу после регистрации.</summary>
+        public async Task<string?> AddPlayersToGroupAsync(Guid id, MovePlayersDto dto, CancellationToken ct)
+        {
+            for(int i=0; i<dto.PlayerIds.Length; i++)
+            {
+                var players = await _data.Players.Query().Where(p => p.Id == dto.PlayerIds[i]).FirstAsync(ct);
+                if (players == null)
+                    return "Пользователь не найден";
+
+                if (players.GroupId != null)
+                    return "Пользователь уже закреплен за группой";
+
+                players.GroupId = id;
+                _data.Players.Update(players);
+                await _data.SaveChangesAsync(ct);
+            }
             return null;
         }
 

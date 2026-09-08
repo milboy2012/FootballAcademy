@@ -24,4 +24,4 @@ namespace UI.Controllers
     }
 }
 
-public record GroupPrintVm(GroupListItemDto Group, List<GroupPlayerDto> Players);
+

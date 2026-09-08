@@ -11,8 +11,13 @@
         const isMatch = data.kind === 'Match';
         $('hTitle').textContent = `${isMatch ? 'Матч ' : ''}${data.groupName}${isMatch && data.opponentName ? ' — ' + data.opponentName : ''}`;
         $('hSub').textContent = `${new Date(data.startsAt).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}, ${fmtT(data.startsAt)}–${fmtT(data.endsAt)} · ${data.venueName}`;
-        const st = { Planned: ['bg-primary', 'запланирована'], Completed: ['bg-success', 'проведена'], Cancelled: ['bg-secondary', 'отменена'] }[data.status];
-        $('hStatus').className = `badge fs-6 ${st[0]}`; $('hStatus').textContent = st[1];
+        const st = {
+            0: ['bg-primary', 'запланирована'],
+            1: ['bg-success', 'проведена'],
+            2: ['bg-secondary', 'отменена']
+        }[data.status];
+        $('hStatus').className = `badge fs-6 ${st[0]}`;
+        $('hStatus').textContent = st[1];
         $('managerNote').textContent = data.note ? `Примечание менеджера: ${data.note}` : '';
         $('summary').value = data.summary ?? ''; $('highlights').value = data.highlights ?? '';
 
@@ -79,7 +84,14 @@
     async function load() {
         const r = await fetch(`/api/coach/trainings/${id}`);
         if (!r.ok) { $('hTitle').textContent = 'Тренировка не найдена'; return; }
-        data = await r.json(); render();
+        data = await r.json();
+        render();
     }
     load();
+
+    //const noSub = !p.subscription.isValid;
+    // ...
+    // <input type="radio" value="1" ${noSub ? 'disabled' : ''}><label class="btn btn-outline-success ${noSub ? 'disabled' : ''}" title="${noSub ? p.subscription.text : ''}">✓</label>
+    // в подписи игрока:
+    //${ noSub ? `<span class="text-danger">· ${p.subscription.text}</span>` : `<span class="text-success">· ${p.subscription.text}</span>`}
 })();
