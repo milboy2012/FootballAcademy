@@ -25,6 +25,10 @@ namespace Core.Entity
         public string? City { get; set; }
         public bool NotifyByEmail { get; set; } = true;
 
+        //обратная навигация
+        public Coach? Coach { get; set; }
+        public ParentProfile? ParentProfile { get; set; }
+        public Player? Player { get; set; }
 
         // Навигационные свойства
         public virtual ICollection<Post> Posts{ get; set; }

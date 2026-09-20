@@ -20,13 +20,17 @@ namespace Core.Configurations
 
             b.HasOne(p => p.Parent).WithMany()
                 .HasForeignKey(p => p.ParentId).OnDelete(DeleteBehavior.Restrict);
+
             b.HasOne(p => p.Group).WithMany(g => g.Players)
                 .HasForeignKey(p => p.GroupId).OnDelete(DeleteBehavior.SetNull);
 
             b.HasIndex(p => new { p.LastName, p.FirstName });
 
-            b.HasOne(p => p.User).WithOne()
-                .HasForeignKey<Player>(p => p.UserId).OnDelete(DeleteBehavior.SetNull);
+            b.HasOne(p => p.User)
+                .WithOne(s=>s.Player)
+                .HasForeignKey<Player>(p => p.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             b.HasIndex(p => p.UserId).IsUnique();
         }
     }

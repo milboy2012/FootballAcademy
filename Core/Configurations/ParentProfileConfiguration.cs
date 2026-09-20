@@ -16,9 +16,11 @@ namespace Core.Configurations
             b.ToTable("ParentProfiles");
 
             b.HasOne(pp => pp.User)
-            .WithOne() // Если у AppUser нет свойства ParentProfile
+            .WithOne(p=>p.ParentProfile) // Если у AppUser нет свойства ParentProfile
             .HasForeignKey<ParentProfile>(pp => pp.UserId)
             .OnDelete(DeleteBehavior.Cascade); // Каскадное удаление
+
+            b.HasIndex(u => u.UserId).IsUnique();
         }
     }
 }

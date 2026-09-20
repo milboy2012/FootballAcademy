@@ -13,7 +13,7 @@ namespace Core.Configurations
     {
         public void Configure(EntityTypeBuilder<TrainingGroup> b)
         {
-            b.ToTable("TrainingGroups");
+            b.ToTable("Groups");
             b.Property(g => g.Name).HasMaxLength(50).IsRequired();
             b.Property(g => g.Color).HasMaxLength(7);
             b.HasIndex(g => g.Name).IsUnique();

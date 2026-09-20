@@ -49,6 +49,9 @@ namespace Core.Entity
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new PlayerConfiguration());
+            builder.ApplyConfiguration(new CoachConfiguration());
+            builder.ApplyConfiguration(new ParentProfileConfiguration());
+            builder.ApplyConfiguration(new TrainingGroupConfiguration());
             //builder.Entity<Player>(entity =>
             //{
             //    entity.HasBaseType<AppUser>();

@@ -31,8 +31,9 @@ namespace UI.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user is null) return Challenge();
 
-
-
+            var us = await _data.Players.Query().Where(s=>s.ParentId == user.Id).ToListAsync();            
+            var uss = await _data.Users.Query().Where(s => s.Id == user.Id).FirstOrDefaultAsync();
+            
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
             var children = new List<ChildCardVm>();
@@ -58,13 +59,15 @@ namespace UI.Controllers
 
                 }
                 TrainingGroup group = new TrainingGroup();
-                Coach coach = new Coach();
+                Coach c = new Coach();
+                AppUser coach = new AppUser();
                 if (p.GroupId != null)
                 {
                     group = await _data.Groups.GetByIdAsync(p.GroupId, ct);
                     if(group != null)
                     {
-                        coach = await _data.Coaches.GetByIdAsync(group.CoachId);                        
+                        c = await _data.Coaches.Query().FirstOrDefaultAsync(s=>s.Id == group.CoachId);
+                        coach = await _data.Users.Query().FirstOrDefaultAsync(s => s.Id == c.UserId);
                     }
                         
                 }
@@ -78,7 +81,7 @@ namespace UI.Controllers
                     //GroupName = p.Group != null ? p.Group.Name : null,                    
                     //CoachName = p.Group != null ? p.Group.Coach.User.LastName + " " + p.Group.Coach.User.FirstName : null,
                     GroupName = group != null ?  group.Name : null,
-                    //CoachName = coach != null ? group.Coach.User.LastName + " " + group.Coach.User.FirstName : null,
+                    CoachName = coach != null ? coach.LastName + " " + coach.FirstName : null,
                     MedicalUntil = p.MedicalCertificateUntil,
                     IsActive = p.IsActive,
                     Login = p.User != null ? p.User.UserName : null,

@@ -17,8 +17,11 @@ namespace Core.Configurations
             b.Property(c => c.Bio).HasMaxLength(2000);
             b.Property(c => c.Qualification).HasMaxLength(200);
 
-            b.HasOne(c => c.User).WithOne()
-                .HasForeignKey<Coach>(c => c.UserId).OnDelete(DeleteBehavior.Cascade);
+            b.HasOne(c => c.User) //зависимая сторона: Coach
+                .WithOne(u=>u.Coach) //главная: AppUser обратная навигация
+                .HasForeignKey<Coach>(c => c.UserId) //FK живет в Coach
+                .OnDelete(DeleteBehavior.Cascade);            
+
             b.HasIndex(c => c.UserId).IsUnique();
         }
     }

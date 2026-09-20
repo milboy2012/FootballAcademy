@@ -16,7 +16,7 @@ namespace Core.Entity
         public DateOnly? HiredAt { get; set; }
 
         public string? Achievements { get; set; }
-        public int? ExperienceYears { get; set; }
+        public int? ExperienceYears { get; set; }        
 
         public ICollection<TrainingGroup> Groups { get; set; } = [];
     }
