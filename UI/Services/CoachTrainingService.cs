@@ -2,7 +2,9 @@
 using Core.Enums;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using UI.Models.DataModels;
 using UI.Models.ViewModels.Coach;
+using UI.Models.ViewModels.Parent;
 using UI.Models.ViewModels.Subscription;
 using UI.Services.Interfaces;
 
@@ -186,6 +188,109 @@ namespace UI.Services
                 if (unmarked > 0) return $"Не отмечено игроков: {unmarked}. Отметьте всех, чтобы завершить тренировку";
                 t.Status = TrainingStatus.Completed;
                 t.CompletedAt = DateTime.UtcNow;
+            }
+            await _data.SaveChangesAsync(ct);
+            return null;
+        }
+        //-----------------------------------Оценки за тренировку
+        public async Task<(TrainingAssessmentsDto? Dto, string? Error)> GetAssessmentsAsync(Guid trainingId, Guid coachId, CancellationToken ct)
+        {
+            var t = await MyTrainings(coachId).AsNoTracking().Where(x => x.Id == trainingId)
+                .Select(x => new { x.Id, x.GroupId, x.Status, x.StartsAt }).FirstOrDefaultAsync(ct);
+            if (t is null) return (null, "Тренировка не найдена");
+
+            var skills = await _data.Skills.Query().AsNoTracking().Where(s => s.IsActive).OrderBy(s => s.SortOrder)
+                .Select(s => new SkillDto(s.Id, s.Name, s.Description)).ToListAsync(ct);
+
+            var present = await _data.Attendances.Query().AsNoTracking().Where(a => a.TrainingId == trainingId && a.Present).Select(a => a.PlayerId).ToListAsync(ct);
+            //var existing = await _data.SkillAssessments.Query().AsNoTracking().Where(a => a.TrainingId == trainingId)
+            //    .Select(a => new { a.PlayerId, a.Comment, Scores = a.Scores.ToDictionary(s => s.SkillId, s => s.Value) }).ToDictionaryAsync(a => a.PlayerId, ct);
+
+            var rws = await _data.SkillAssessments.Query()
+                        .AsNoTracking()
+                        .Where(a => a.TrainingId == trainingId)
+                        .Select(a => new
+                        {
+                            a.PlayerId,
+                            a.Comment,
+                            Scores = a.Scores.Select(s => new { s.SkillId, s.Value }).ToList()
+                        })
+                        .ToListAsync(ct);
+
+            var existing = rws.ToDictionary(
+                a => a.PlayerId,
+                a => new
+                {
+                    a.PlayerId,
+                    a.Comment,
+                    Scores = a.Scores.ToDictionary(s => s.SkillId, s => s.Value)
+                });
+
+            var players = await _data.Players.Query().AsNoTracking().Where(p => p.GroupId == t.GroupId && p.IsActive)
+                .OrderBy(p => p.LastName).Select(p => new { p.Id, Name = p.LastName + " " + p.FirstName }).ToListAsync(ct);
+
+            // среднее по последним 5 оценённым тренировкам (до текущей)
+            var ids = players.Select(p => p.Id).ToList();
+            var recent = await _data.SkillScores.Query().AsNoTracking()
+                .Where(s => ids.Contains(s.Assessment.PlayerId) && s.Assessment.TrainingId != null && s.Assessment.Training!.StartsAt < t.StartsAt)
+                .Select(s => new { s.Assessment.PlayerId, s.SkillId, s.Value, s.Assessment.Training!.StartsAt }).ToListAsync(ct);
+            var avg = recent.GroupBy(r => r.PlayerId).ToDictionary(g => g.Key, g =>
+                g.GroupBy(r => r.SkillId).ToDictionary(sg => sg.Key, sg => Math.Round(sg.OrderByDescending(r => r.StartsAt).Take(5).Average(r => r.Value), 1)));
+
+            var rows = players.Select(p =>
+            {
+                existing.TryGetValue(p.Id, out var e);
+                return new TrainingAssessmentRowDto(p.Id, p.Name, present.Contains(p.Id), e?.Scores, e?.Comment, avg.GetValueOrDefault(p.Id) ?? []);
+            }).ToList();
+
+            return (new TrainingAssessmentsDto(skills, rows, t.Status == TrainingStatus.Completed), null);
+        }
+
+        public async Task<string?> SaveAssessmentsAsync(Guid trainingId, Guid coachId, SaveAssessmentsDto dto, CancellationToken ct)
+        {
+            var t = await MyTrainings(coachId).Include(x => x.Group).FirstOrDefaultAsync(x => x.Id == trainingId, ct);
+            if (t is null) return "Тренировка не найдена";
+            if (t.Status == TrainingStatus.Cancelled) return "Тренировка отменена";
+            if (t.StartsAt > DateTime.UtcNow) return "Оценки выставляются после начала тренировки";
+
+            var skillIds = await _data.Skills.Query().Where(s => s.IsActive).Select(s => s.Id).ToHashSetAsync(ct);
+            var present = await _data.Attendances.Query().Where(a => a.TrainingId == trainingId && a.Present).Select(a => a.PlayerId).ToHashSetAsync(ct);
+            var existing = await _data.SkillAssessments.Query().Include(a => a.Scores).Where(a => a.TrainingId == trainingId).ToListAsync(ct);
+            var parents = await _data.Players.Query().Where(p => p.GroupId == t.GroupId).Select(p => new { p.Id, p.ParentId, p.FirstName }).ToDictionaryAsync(p => p.Id, ct);
+            var date = DateOnly.FromDateTime(t.StartsAt);
+
+            foreach (var p in dto.Players)
+            {
+                if (!parents.ContainsKey(p.PlayerId)) return "Игрок не из этой группы";
+                var scores = p.Scores.Where(s => skillIds.Contains(s.Key)).ToDictionary(s => s.Key, s => s.Value);
+                if (scores.Values.Any(v => v is < 1 or > 10)) return "Оценки от 1 до 10";
+                var a = existing.FirstOrDefault(x => x.PlayerId == p.PlayerId);
+
+                if (scores.Count == 0 && string.IsNullOrWhiteSpace(p.Comment))
+                { if (a is not null) _data.SkillAssessments.Delete(a); continue; }           // очистили — удалить
+                if (!present.Contains(p.PlayerId)) return $"{parents[p.PlayerId].FirstName}: нельзя оценить отсутствующего";
+
+                var isNew = a is null;
+                if (a is null) { 
+                    a = new SkillAssessment { PlayerId = p.PlayerId, CoachId = coachId, TrainingId = trainingId, Date = date, Season = t.Group.Season }; 
+                    await _data.SkillAssessments.AddAsync(a); 
+                }
+
+                a.Comment = p.Comment?.Trim();
+                // синхронизируем набор оценок
+                foreach (var s in a.Scores.Where(s => !scores.ContainsKey(s.SkillId)).ToList()) _data.SkillScores.Delete(s);
+                foreach (var (skillId, value) in scores)
+                {
+                    var sc = a.Scores.FirstOrDefault(x => x.SkillId == skillId);
+                    if (sc is null) a.Scores.Add(new SkillScore { SkillId = skillId, Value = value }); else sc.Value = value;
+                }
+                if (isNew) await _data.Notifications.AddAsync(new Notification
+                {
+                    UserId = parents[p.PlayerId].ParentId,
+                    Title = "Новые оценки",
+                    Message = $"Тренер оценил {parents[p.PlayerId].FirstName} за тренировку {TimeZoneInfo.ConvertTimeFromUtc(t.StartsAt, AppTime.Tz()):dd.MM}",
+                    Link = $"/Parent/Progress/{p.PlayerId}"
+                });
             }
             await _data.SaveChangesAsync(ct);
             return null;

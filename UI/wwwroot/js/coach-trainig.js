@@ -26,7 +26,7 @@
                 <td>
                     <div class="fw-semibold">${p.lastName} ${p.firstName}</div>
                     <small class="text-muted">${p.age ? p.age + ' лет · ' : ''}посещаемость ${p.attendancePercent}%
-                        ${p.medicalValid ? '' : ' · <span class="text-danger">нет справки</span>'}${p.hasActiveSubscription ? '' : ' · <span class="text-warning">нет абонемента</span>'}</small>
+                        ${p.medicalValid ? '' : ' · <span class="text-danger">нет справки</span>'}${p.subscription.isValid ? '' : ' · <span class="text-warning">нет абонемента</span>'}</small>
                 </td>
                 <td class="text-center">
                     <div class="btn-group btn-group-sm" role="group">
@@ -84,7 +84,7 @@
     async function load() {
         const r = await fetch(`/api/coach/trainings/${id}`);
         if (!r.ok) { $('hTitle').textContent = 'Тренировка не найдена'; return; }
-        data = await r.json();
+        data = await r.json();        
         render();
     }
     load();

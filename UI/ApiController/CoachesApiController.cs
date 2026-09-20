@@ -12,7 +12,7 @@ namespace UI.ApiController
 
     [ApiController]
     [Route("api/coaches")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Manager")]
     [IgnoreAntiforgeryToken]
     public class CoachesApiController : ControllerBase
     {

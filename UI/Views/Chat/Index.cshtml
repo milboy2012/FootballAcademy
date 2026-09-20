@@ -1,0 +1,99 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Чат"; Layout = "_Layout";
+}
+<style>
+    .chat-wrap {
+        height: calc(100vh - 180px);
+        min-height: 480px;
+    }
+
+    .chat-list {
+        overflow-y: auto;
+    }
+
+    .chat-msgs {
+        overflow-y: auto;
+        background: #f6f7f9;
+    }
+
+    .bubble {
+        max-width: 75%;
+        border-radius: 14px;
+        padding: 8px 12px;
+    }
+
+    .mine .bubble {
+        background: #d1e7ff;
+        margin-left: auto;
+    }
+
+    .theirs .bubble {
+        background: #fff;
+        border: 1px solid #e3e6ea;
+    }
+
+    .role-Coach {
+        color: #198754
+    }
+
+    .role-Manager, .role-Admin {
+        color: #dc3545
+    }
+
+    .role-Parent {
+        color: #6f42c1
+    }
+
+    .role-Player {
+        color: #0d6efd
+    }
+
+    .reply {
+        border-left: 3px solid #adb5bd;
+        padding-left: 8px;
+        font-size: .85em;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+</style>
+
+<div class="row g-0 chat-wrap border rounded overflow-hidden">
+    <div class="col-md-4 col-lg-3 border-end d-flex flex-column">
+        <div class="p-2 border-bottom"><strong>Группы</strong></div>
+        <div class="list-group list-group-flush chat-list flex-grow-1" id="groups"></div>
+    </div>
+    <div class="col-md-8 col-lg-9 d-flex flex-column">
+        <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+            <div><strong id="gTitle">Выберите группу</strong><div class="small text-muted" id="gSub"></div></div>
+            <button class="btn btn-sm btn-outline-secondary" id="btnMembers" disabled><i class="bi bi-people"></i></button>
+        </div>
+        <div class="flex-grow-1 chat-msgs p-3" id="msgs"><div class="text-center text-muted mt-5">Выберите группу слева</div></div>
+        <div class="small text-muted px-3" id="typing" style="height:20px"></div>
+        <div class="p-2 border-top">
+            <div id="replyBox" class="reply d-none mb-1 d-flex justify-content-between"><span id="replyText"></span><a href="#" id="replyCancel">✕</a></div>
+            <form id="sendForm" class="d-flex gap-2">
+                <textarea id="text" class="form-control" rows="1" placeholder="Сообщение…" maxlength="2000" disabled></textarea>
+                <button class="btn btn-primary" id="btnSend" disabled><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="membersModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header"><h6 class="modal-title">Участники</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <ul class="list-group list-group-flush" id="membersList"></ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script> *@
+    <script src="~/js/framework/signalr.min.js"></script>
+    <script>window.chatInit = { me: '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value', group: '@ViewBag.Group', isModerator: @((User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("Coach")).ToString().ToLower()) };</script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

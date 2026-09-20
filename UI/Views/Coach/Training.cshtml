@@ -6,14 +6,14 @@
     ViewData["Title"] = "Проведение тренировки";
 }
 
-<a href="/Coach" class="text-decoration-none">&larr; К расписанию</a>
+<a href="/Coach/CoachTraining" class="text-decoration-none">&larr; К расписанию</a>
 <div class="d-flex justify-content-between align-items-start mt-2 mb-3">
     <div><h2 class="mb-0" id="hTitle">…</h2><div class="text-muted" id="hSub"></div></div>
     <span class="badge fs-6" id="hStatus"></span>
 </div>
 
 <div class="row g-3">
-    <div class="col-lg-7">
+    <div class="col-lg-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong>Посещаемость</strong>
@@ -29,8 +29,18 @@
                 </table>
             </div>
         </div>
+        <div class="card mt-3" id="assessCard">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                @* <strong>Оценки навыков</strong> *@
+                <div class="small col-lg-1 text-muted">1–10 · пусто = без оценки · серым показано среднее за 5 последних</div>
+                <div class="table-responsive"><table class="table table-sm align-middle mb-0" id="assessTable"><thead></thead><tbody></table></div>
+                <div class="card-footer d-flex gap-2 align-items-center">
+                    <button class="btn btn-primary btn-sm" id="btnSaveAssess">Сохранить оценки</button>
+                    <button class="btn btn-outline-secondary btn-sm" id="btnFillAvg" title="Заполнить пустые клетки средним">Заполнить средним</button>
+                    <span class="small" id="assessMsg"></span>
+                </div>
+            </div>            
     </div>
-    <div class="col-lg-5">
         <div class="card">
             <div class="card-header"><strong>Заметки о тренировке</strong></div>
             <div class="card-body">
@@ -41,6 +51,8 @@
                 <textarea id="highlights" class="form-control" rows="3" placeholder="Иванов — лучшая работа в защите…"></textarea>
             </div>
         </div>
+    <div class="col-lg-5">
+        
         <div class="alert alert-danger mt-3 d-none" id="err"></div>
         <div class="alert alert-success mt-3 d-none" id="ok"></div>
         <div class="d-flex gap-2 mt-3">
@@ -53,4 +65,5 @@
 @section Scripts {
     <script>window.trainingId = '@Model';</script>
     <script src="~/js/coach-trainig.js" asp-append-version="true"></script>
+    <script src="~/js/coach-assess.js" asp-append-version="true"></script>
 }

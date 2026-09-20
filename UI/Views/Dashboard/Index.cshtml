@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Панель управления";
+}
+<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="mb-0">Панель управления</h2><small class="text-muted" id="updated"></small></div>
+
+<div id="alerts" class="mb-3"></div>
+
+<div class="row g-3 mb-3" id="kpi">
+    @foreach (var (id, label, link, icon) in new[] {
+        ("activePlayers","активных игроков","/Players","people"), ("groups","групп","/Groups","diagram-3"), ("coaches","тренеров","/Coaches","person-badge"),
+        ("attendancePercentMonth","посещаемость за месяц","/Groups","check2-square"), ("revenueMonth","оплат за месяц","/Subscriptions","cash-stack"),
+        ("pendingSubscriptions","ожидают оплаты","/Subscriptions","hourglass-split"), ("expiringWeek","истекают за 7 дней","/Subscriptions","alarm"),
+        ("trainingsWeek","тренировок на этой неделе","/Schedule","calendar-week") })
+    {
+        <div class="col-6 col-md-3">
+            <a href="@link" class="card text-decoration-none text-body h-100">
+                <div class="card-body py-2 d-flex align-items-center gap-3">
+                    <i class="bi bi-@icon fs-2 text-primary"></i><div><div class="fs-3 fw-bold" id="k-@id">–</div><div class="text-muted small">@label</div><div class="small" id="k-@id-sub"></div></div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Поступления по месяцам</div><div class="card-body"><canvas id="chRevenue" height="120"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Посещаемость по неделям, %</div><div class="card-body"><canvas id="chAtt" height="120"></canvas></div></div></div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-4"><div class="card h-100"><div class="card-header">Заполненность групп</div><div class="card-body"><canvas id="chFill"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="card h-100"><div class="card-header">Посещаемость по группам за месяц, %</div><div class="card-body"><canvas id="chAttGroup"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="card h-100"><div class="card-header">Причины пропусков за месяц</div><div class="card-body"><canvas id="chReasons"></canvas></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Загрузка площадок за месяц, часов</div><div class="card-body"><canvas id="chVenues" height="110"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Средние оценки навыков по академии (30 дней)</div><div class="card-body"><canvas id="chSkills"></canvas></div></div></div>
+</div>
+
+@section Scripts {
+    @* <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script> *@
+    <script src="~/js/framework/chart.js@4.4.4/chart.umd.min.js"></script>
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

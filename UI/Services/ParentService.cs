@@ -93,6 +93,8 @@ namespace UI.Services
 
         public async Task<ProgressDto> GetProgressAsync(Guid playerId, string? season, CancellationToken ct)
         {
+            var player = _data.Players.GetByIdAsync(playerId);
+            
             var skills = await _data.Skills.Query().AsNoTracking().Where(s => s.IsActive).OrderBy(s => s.SortOrder)
                 .Select(s => new SkillDto(s.Id, s.Name, s.Description)).ToListAsync(ct);
 
@@ -100,10 +102,28 @@ namespace UI.Services
             season ??= await _data.Players.Query().Where(p => p.Id == playerId).Select(p => p.Group != null ? p.Group.Season : null).FirstOrDefaultAsync(ct);
             if (season is not null) q = q.Where(a => a.Season == season);
 
-            var list = await q.OrderBy(a => a.Date)
-                .Select(a => new AssessmentDto(a.Id, a.Date, a.Coach.User.LastName + " " + a.Coach.User.FirstName, a.Comment,
-                    a.Scores.ToDictionary(s => s.SkillId, s => s.Value)))
-                .ToListAsync(ct);
+            var list = new List<AssessmentDto>();
+            try
+            {
+                var dd = q.OrderBy(a => a.Date).ToList();
+                foreach(var it in dd)
+                {
+                    Coach coach = await _data.Coaches.GetByIdAsync(it.CoachId);
+                    AppUser user = await _data.Users.GetByIdAsync(coach.UserId);
+                    AssessmentDto add = new AssessmentDto(it.Id, it.Date, (user.LastName + user.FirstName), it.Comment, new Dictionary<Guid, int>());
+                        
+                    
+                    list.Add(add);
+                }
+                //.Select(a => new AssessmentDto(a.Id, a.Date, a.Coach.User.LastName + " " + a.Coach.User.FirstName, a.Comment,
+                //    a.Scores.ToDictionary(s => s.SkillId, s => s.Value)))
+                //.ToListAsync(ct);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
 
             Dictionary<Guid, double>? groupAvg = null;
             var groupId = await _data.Players.Query().Where(p => p.Id == playerId).Select(p => p.GroupId).FirstOrDefaultAsync(ct);
@@ -118,6 +138,7 @@ namespace UI.Services
                     .ToDictionaryAsync(x => x.Key, x => Math.Round(x.Avg, 1), ct);
             }
 
+            //return new ProgressDto(skills, list, list.FirstOrDefault(), list.LastOrDefault(), groupAvg, season);
             return new ProgressDto(skills, list, list.FirstOrDefault(), list.LastOrDefault(), groupAvg, season);
         }
 

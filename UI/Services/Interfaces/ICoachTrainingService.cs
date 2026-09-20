@@ -9,5 +9,8 @@ namespace UI.Services.Interfaces
         Task<List<UpcomingDto>> GetUpcomingAsync(Guid coachId, int days, CancellationToken ct);
         Task<(TrainingDetailsDto? Dto, string? Error)> GetTrainingAsync(Guid trainingId, Guid coachId, CancellationToken ct);
         Task<string?> ConductAsync(Guid trainingId, Guid coachId, ConductDto dto, CancellationToken ct);
+        Task<(TrainingAssessmentsDto? Dto, string? Error)> GetAssessmentsAsync(Guid trainingId, Guid coachId, CancellationToken ct);
+        Task<string?> SaveAssessmentsAsync(Guid trainingId, Guid coachId, SaveAssessmentsDto dto, CancellationToken ct);
+        
     }
 }

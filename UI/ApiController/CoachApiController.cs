@@ -12,16 +12,18 @@ namespace UI.ApiController
 {
     [ApiController]
     [Route("api/coach")]
-    [Authorize(Roles = "Coach,Admin,Manager")]
+    //[Authorize(Roles = "Coach,Manager")]
     [IgnoreAntiforgeryToken]
     public class CoachApiController : ControllerBase
     {
         private readonly ICoachTrainingService _svc;
+        private readonly IParentService _ps;
         private readonly IUoW _data;
-        public CoachApiController(ICoachTrainingService svc, IUoW data)
+        public CoachApiController(ICoachTrainingService svc, IParentService ps, IUoW data)
         {
             _svc = svc;
             _data = data;
+            _ps = ps;
         }
 
         //рекорды для для отправки оценок навыков родителям
@@ -57,7 +59,8 @@ namespace UI.ApiController
 
         //--методы для отправки оценок навыков родителям
         [HttpGet("skills")]
-        public async Task<IActionResult> Skills([FromServices] ContextAuth ctx, CancellationToken ct) 
+        //public async Task<IActionResult> Skills([FromServices] IUoW data, CancellationToken ct) 
+        public async Task<IActionResult> Skills(CancellationToken ct) 
             => Ok(await _data.Skills.Query().Where(s => s.IsActive).OrderBy(s => s.SortOrder).Select(s => new { s.Id, s.Name }).ToListAsync(ct));
 
         [HttpGet("players/{playerId:guid}/assessments")]
@@ -65,13 +68,13 @@ namespace UI.ApiController
             => Ok(await ps.GetProgressAsync(playerId, null, ct)); // тот же DTO, что видит родитель
 
         [HttpPost("players/{playerId:guid}/assessments")]
-        public async Task<IActionResult> Assess(Guid playerId, AssessDto dto, [FromServices] ContextAuth ctx, CancellationToken ct)
+        public async Task<IActionResult> Assess(Guid playerId, AssessDto dto, [FromServices] IUoW data, CancellationToken ct)
         {
             if (await CoachIdAsync(ct) is not Guid coachId) return NotFound();
-            var player = await ctx.Players.Include(p => p.Group).FirstOrDefaultAsync(p => p.Id == playerId && p.Group!.CoachId == coachId, ct);
+            var player = await _data.Players.Query().Include(p => p.Group).FirstOrDefaultAsync(p => p.Id == playerId && p.Group!.CoachId == coachId, ct);
             if (player is null) return Forbid();
             if (dto.Scores.Count == 0 || dto.Scores.Any(s => s.Value is < 1 or > 10)) return BadRequest(new { error = "Оценки от 1 до 10" });
-            if (await ctx.SkillAssessments.AnyAsync(a => a.PlayerId == playerId && a.Date == dto.Date, ct)) return BadRequest(new { error = "На эту дату оценка уже есть" });
+            if (await _data.SkillAssessments.AnyAsync(a => a.PlayerId == playerId && a.Date == dto.Date, ct)) return BadRequest(new { error = "На эту дату оценка уже есть" });
 
             var a = new SkillAssessment
             {
@@ -82,10 +85,25 @@ namespace UI.ApiController
                 Comment = dto.Comment?.Trim(),
                 Scores = dto.Scores.Select(s => new SkillScore { SkillId = s.SkillId, Value = s.Value }).ToList()
             };
-            ctx.SkillAssessments.Add(a);
-            ctx.Notifications.Add(new Notification { UserId = player.ParentId, Title = "Новая оценка навыков", Message = $"Тренер оценил навыки {player.FirstName} ({dto.Date:dd.MM.yyyy})", Link = $"/Parent/Progress/{playerId}" });
-            await ctx.SaveChangesAsync(ct);
+            await _data.SkillAssessments.AddAsync(a);
+            await _data.Notifications.AddAsync(new Notification { UserId = player.ParentId, Title = "Новая оценка навыков", Message = $"Тренер оценил навыки {player.FirstName} ({dto.Date:dd.MM.yyyy})", Link = $"/Parent/Progress/{playerId}" });
+            await _data.SaveChangesAsync(ct);
             return Ok(new { a.Id });
+        }
+
+        [HttpGet("trainings/{id:guid}/assessments")]
+        public async Task<IActionResult> Assessments(Guid id, CancellationToken ct)
+        {
+            if (await CoachIdAsync(ct) is not Guid c) return NotFound();
+
+            var (dto, e) = await _svc.GetAssessmentsAsync(id, c, ct); return e is null ? Ok(dto) : NotFound(new { error = e });
+        }
+
+        [HttpPut("trainings/{id:guid}/assessments")]
+        public async Task<IActionResult> SaveAssessments(Guid id, SaveAssessmentsDto dto, CancellationToken ct)
+        {
+            if (await CoachIdAsync(ct) is not Guid c) return NotFound();
+            var e = await _svc.SaveAssessmentsAsync(id, c, dto, ct); return e is null ? NoContent() : BadRequest(new { error = e });
         }
     }
 }

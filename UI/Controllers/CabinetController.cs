@@ -43,15 +43,42 @@ namespace UI.Controllers
 
             foreach (var p in allChildren)
             {
-                var subscriptionStatus = await _subServ.GetStatusAsync(p.Id, ct);               
+                var subscriptionStatus = await _subServ.GetStatusAsync(p.Id, ct);
+                DateTime? dateTime = new DateTime();
+                if(p.GroupId != null)
+                {
+                    //var data = p.Group.Trainings
+                    //    .Where(t => t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
+                    //    .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt).FirstOrDefault();
+                    DateTime? data = _data.Trainings.Query()
+                        .Where(t => t.GroupId == p.GroupId && t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
+                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
+                        .FirstOrDefault();
+
+
+                }
+                TrainingGroup group = new TrainingGroup();
+                Coach coach = new Coach();
+                if (p.GroupId != null)
+                {
+                    group = await _data.Groups.GetByIdAsync(p.GroupId, ct);
+                    if(group != null)
+                    {
+                        coach = await _data.Coaches.GetByIdAsync(group.CoachId);                        
+                    }
+                        
+                }
+                
 
                 children.Add(new ChildCardVm
                 {
                     Id = p.Id,
                     FullName = p.LastName + " " + p.FirstName,
                     BirthDate = p.BirthDate,
-                    GroupName = p.Group != null ? p.Group.Name : null,
-                    CoachName = p.Group != null ? p.Group.Coach.User.LastName + " " + p.Group.Coach.User.FirstName : null,
+                    //GroupName = p.Group != null ? p.Group.Name : null,                    
+                    //CoachName = p.Group != null ? p.Group.Coach.User.LastName + " " + p.Group.Coach.User.FirstName : null,
+                    GroupName = group != null ?  group.Name : null,
+                    //CoachName = coach != null ? group.Coach.User.LastName + " " + group.Coach.User.FirstName : null,
                     MedicalUntil = p.MedicalCertificateUntil,
                     IsActive = p.IsActive,
                     Login = p.User != null ? p.User.UserName : null,
@@ -61,10 +88,11 @@ namespace UI.Controllers
                     //    .OrderByDescending(s => s.To).Select(s => (DateOnly?)s.To).FirstOrDefault(),
                     Subscription = new SubscriptionStatusDto(subscriptionStatus.IsValid, subscriptionStatus.Text, subscriptionStatus.Status, subscriptionStatus.To, subscriptionStatus.TrainingsLeft, subscriptionStatus.HasPending),
                     //Subscription = new SubscriptionStatusDto(false, "нет подписки", SubscriptionStatus.Expired, null,null,false),
-                    NextTraining = p.Group != null
-                    ? p.Group.Trainings
-                        .Where(t => t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
-                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt).FirstOrDefault()
+                    NextTraining = p.GroupId != null
+                    ? _data.Trainings.Query()
+                        .Where(t => t.GroupId == p.GroupId && t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
+                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
+                        .FirstOrDefault()
                     : null
                 });
             }

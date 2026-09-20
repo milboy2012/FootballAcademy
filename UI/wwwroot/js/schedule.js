@@ -18,7 +18,8 @@
         const fill = (sel, items, first) => { sel.length = 0; if (first) sel.add(new Option(first, '')); items.forEach(i => sel.add(new Option(i.name, i.id))); };
         fill($('fGroup'), groups, 'Все группы'); fill($('fVenue'), venues, 'Все места');
         if (canEdit) {
-            fill(document.querySelector('[name=groupId]'), groups); fill(document.querySelector('[name=opponentGroupId]'), groups);
+            fill(document.querySelector('[name=groupId]'), groups); 
+            fill(document.querySelector('[name=opponentGroupId]'), groups);
             fill(document.querySelector('[name=venueId]'), venues);
         }
     }
@@ -26,7 +27,17 @@
     // ---------- календарь ----------
     const initDate = new URLSearchParams(location.search).get('date') || undefined;
     const calendar = new FullCalendar.Calendar($('calendar'), {
-        locale: 'ru', initialView: 'timeGridWeek', initialDate: initDate, height: 'auto',
+        locale: 'ru',
+        buttonText: {
+            today: 'Сегодня',
+            month: 'Месяц',
+            week: 'Неделя',
+            day: 'День',
+            list: 'Список'
+        },
+        allDayText: 'Весь день',
+        noEventsText: 'Нет событий',
+        initialView: 'timeGridWeek', initialDate: initDate, height: 'auto',
         slotMinTime: '08:00:00', slotMaxTime: '22:00:00', allDaySlot: false, nowIndicator: true, firstDay: 1,
         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
         events: { url: '/api/schedule', extraParams: () => ({ groupId: $('fGroup').value, venueId: $('fVenue').value }) },
@@ -96,8 +107,13 @@
     function openEdit(ev) {
         editing = ev; reset(); const p = ev.extendedProps;
         $('evTitle').textContent = 'Редактирование'; $('btnCancelEv').classList.remove('d-none');
-        form.id.value = ev.id; form.kind.value = p.kind; form.groupId.value = p.groupId; form.opponentGroupId.value = p.opponentGroupId ?? '';
-        form.venueId.value = p.venueId; form.date.value = dateOf(ev.start); form.startTime.value = timeOf(ev.start); form.endTime.value = timeOf(ev.end); form.note.value = p.note ?? '';
+        form.id.value = ev.id; 
+        form.kind.value = p.kind; 
+        form.groupId.value = p.groupId; 
+        form.opponentGroupId.value = p.opponentGroupId ?? '';
+        form.venueId.value = p.venueId; form.date.value = dateOf(ev.start); 
+        form.startTime.value = timeOf(ev.start); 
+        form.endTime.value = timeOf(ev.end); form.note.value = p.note ?? '';
         syncKind(); modal.show();
     }
     $('btnAdd').addEventListener('click', () => openCreate());

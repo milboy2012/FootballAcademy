@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UI.Filters;
+using UI.Hubs;
 using UI.Models;
 using UI.Services;
 using UI.Services.Interfaces;
@@ -92,10 +93,19 @@ namespace UI
             builder.Services.AddScoped<IParentService, ParentService>();
             builder.Services.AddScoped<IPlayerCabinetService, PlayerCabinetService>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
+            builder.Services.AddScoped<IUserAdminService, UserAdminService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+
             builder.Services.AddHostedService<SubscriptionExpiryWorker>();
 
+            //SignalR
+            builder.Services.AddSignalR();
 
             // Настройка Identity с кастомными моделями
             builder.Services.AddIdentity<AppUser, AppRole>(options =>
@@ -224,6 +234,12 @@ namespace UI
             }
 
             app.UseHttpsRedirection();
+
+            var uploadsPath = Path.Combine(app.Environment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -233,6 +249,8 @@ namespace UI
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapHub<GroupChatHub>("/hubs/chat");
             app.MapRazorPages();
 
             app.Run();

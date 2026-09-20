@@ -17,19 +17,24 @@ namespace Core
         //репозитории
         private IGenericRepo<AbsenceNotice> _absenceNotice;
         private IGenericRepo<Attendance> _attendance;
+        private IGenericRepo<ChatMessage> _chatMessage;
+        private IGenericRepo<ChatReadMark> _chatReadMark;
         private IGenericRepo<Coach> _coach;
         private IGenericRepo<Notification> _notification;
+        private IGenericRepo<ParentProfile> _parentProfile;
         private IGenericRepo<Payment> _payment;
         private IGenericRepo<Player> _player;
+        private IGenericRepo<Post> _post;
+        private IGenericRepo<AppRole> _role;
         private IGenericRepo<Skill> _skill;
         private IGenericRepo<SkillAssessment> _skillAssessment;
-        private IGenericRepo<SkillScore> _skillScore;
-        
+        private IGenericRepo<SkillScore> _skillScore;        
         private IGenericRepo<Subscription> _subscription;        
         private IGenericRepo<Training> _trainig;
         private IGenericRepo<TrainingGroup> _trainigGroup;
         private IGenericRepo<TrainingPlan> _trainigPlan;
         private IGenericRepo<Venue> _venue;
+        private IGenericRepo<AppUser> _user;       
 
 
         public UoW(ContextAuth context)
@@ -44,6 +49,14 @@ namespace Core
         {
             get { return _attendance ??= new GenericRepo<Attendance>(_context); }
         }
+        public IRepo<ChatMessage> ChatMessages
+        {
+            get { return _chatMessage ??= new GenericRepo<ChatMessage>(_context); }
+        }
+        public IRepo<ChatReadMark> ChatReadMarks
+        {
+            get { return _chatReadMark ??= new GenericRepo<ChatReadMark>(_context); }
+        }
         public IRepo<Coach> Coaches
         {
             get { return _coach ??= new GenericRepo<Coach>(_context); }
@@ -52,12 +65,24 @@ namespace Core
         {
             get { return _notification ??= new GenericRepo<Notification>(_context); }
         }
+        public IRepo<ParentProfile> ParentProfiles
+        {
+            get { return _parentProfile ??= new GenericRepo<ParentProfile>(_context); }
+        }
         public IRepo<Payment> Payments
         {
             get { return _payment ??= new GenericRepo<Payment>(_context); }
         }
         public IRepo<Player> Players{ 
             get { return _player ??= new GenericRepo<Player>(_context); }
+        }
+        public IRepo<Post> Posts
+        {
+            get { return _post ??= new GenericRepo<Post>(_context); }
+        }
+        public IRepo<AppRole> Roles
+        {
+            get { return _role ??= new GenericRepo<AppRole>(_context); }
         }
         public IRepo<Skill> Skills
         {
@@ -91,6 +116,11 @@ namespace Core
         {
             get { return _venue ??= new GenericRepo<Venue>(_context); }
         }
+        public IRepo<AppUser> Users
+        {
+            get { return _user ??= new GenericRepo<AppUser>(_context); }
+        }
+        
 
         //public void Dispose()
         //{

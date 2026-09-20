@@ -14,6 +14,9 @@ namespace Core.Configurations
         public void Configure(EntityTypeBuilder<SkillAssessment> b)
         {
             b.ToTable("SkillAssessments");
+            b.HasOne(a => a.Training).WithMany().HasForeignKey(a => a.TrainingId).OnDelete(DeleteBehavior.Cascade);
+            b.HasOne(a => a.Coach).WithMany().HasForeignKey(a => a.CoachId).OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

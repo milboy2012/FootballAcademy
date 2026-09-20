@@ -5,18 +5,46 @@
     fetch('/api/coach/groups').then(r => r.json()).then(gs => gs.forEach(g => $('fGroup').add(new Option(`${g.name} (${g.playersCount})`, g.id))));
 
     const calendar = new FullCalendar.Calendar($('calendar'), {
-        locale: 'ru', initialView: window.innerWidth < 768 ? 'listWeek' : 'timeGridWeek', height: 'auto', firstDay: 1,
-        slotMinTime: '08:00:00', slotMaxTime: '22:00:00', allDaySlot: false, nowIndicator: true,
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' },
-        events: { url: '/api/schedule', extraParams: () => ({ groupId: $('fGroup').value }) },
-        eventClick: info => { if (info.event.extendedProps.status !== 'Cancelled') location.href = `/Coach/Training/${info.event.id}`; },
+        locale: 'ru',
+        buttonText: {
+            today: 'Сегодня',
+            month: 'Месяц',
+            week: 'Неделя',
+            day: 'День',
+            list: 'Список'
+        },
+        allDayText: 'Весь день',
+        noEventsText: 'Нет событий',
+        initialView: window.innerWidth < 768 ? 'listWeek' : 'timeGridWeek', 
+        height: 'auto', 
+        firstDay: 1,
+        slotMinTime: '08:00:00',
+        slotMaxTime: '22:00:00', 
+        allDaySlot: false, 
+        nowIndicator: true,
+        headerToolbar: { 
+            left: 'prev,next today',             
+            center: 'title', 
+            right: 'dayGridMonth,timeGridWeek,listWeek' 
+        },
+        events: { 
+            url: '/api/schedule', 
+            extraParams: () => ({ groupId: $('fGroup').value }) 
+        },
+        eventClick: info => { 
+            if (info.event.extendedProps.status !== 'Cancelled') 
+                location.href = `/Coach/Training/${info.event.id}`; 
+            },
         eventDidMount: info => {
             const p = info.event.extendedProps;
-            if (p.status === 'Completed') info.el.style.opacity = '0.65';
+            if (p.status === 'Completed') 
+                info.el.style.opacity = '0.65';
+
             info.el.title = `${p.venueName}${p.status === 'Completed' ? ' · проведена' : ''}${p.cancelReason ? ' · отменено: ' + p.cancelReason : ''}`;
         }
     });
     calendar.render();
+
     $('fGroup').addEventListener('change', () => calendar.refetchEvents());
 
     fetch('/api/coach/upcoming?days=7').then(r => r.json()).then(list => {

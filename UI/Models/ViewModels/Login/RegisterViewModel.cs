@@ -22,12 +22,12 @@ namespace UI.Models.ViewModels.Login
 
         [Required(ErrorMessage = "Поле Имя обязательно для заполнения")]
         [Display(Name = "Имя")]
-        [StringLength(50, MinimumLength = 2)]
+        [StringLength(50, ErrorMessage = "Имя должно быть минимум {2} символа", MinimumLength = 2)]
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Поле Фамилия обязательно для заполнения")]
         [Display(Name = "Фамилия")]
-        [StringLength(50, MinimumLength = 2)]
+        [StringLength(50, ErrorMessage = "Фамилия должна быть минимум {2} символа", MinimumLength = 2)]
         public string LastName { get; set; }
 
         //[Display(Name = "Роль")]

@@ -3,7 +3,7 @@
     const json = (u, m, b) => fetch(u, { method: m, headers: { 'Content-Type': 'application/json' }, body: b ? JSON.stringify(b) : undefined });
     const errorOf = async r => (await r.json().catch(() => null))?.error ?? `Ошибка ${r.status}`;
     const fmtD = d => d ? new Date(d).toLocaleDateString('ru-RU') : '';
-    const money = v => (v ?? 0).toLocaleString('ru-RU') + ' ₽';
+    const money = v => (v ?? 0).toLocaleString('ru-RU') + ' Br';
     const STATUS = {
         0: ['ожидает оплаты', 'warning text-dark'],
         1: ['активен', 'success'],

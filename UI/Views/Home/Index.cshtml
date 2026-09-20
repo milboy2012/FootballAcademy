@@ -3,6 +3,46 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Новости академии</h2>
+                <div class="btn-group btn-group-sm" id="typeFilter">
+                    <button class="btn btn-outline-secondary active" data-type="">Все</button>
+                    <button class="btn btn-outline-secondary" data-type="Announcement">Объявления</button>
+                    <button class="btn btn-outline-secondary" data-type="News">Новости</button>
+                    <button class="btn btn-outline-secondary" data-type="Competition">Соревнования</button>
+                    <button class="btn btn-outline-secondary" data-type="Holiday">Праздники</button>
+                </div>
+            </div>
+            <div id="feed" class="d-flex flex-column gap-3"></div>
+        </div>
+        
+    </div>
 </div>
+<div class="modal fade" id="postViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header align-items-start">
+                <div class="text-start">
+                    <div class="mb-2" id="pvBadge"></div>
+                    <h4 class="modal-title mb-0" id="pvTitle"></h4>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-start">
+                <img id="pvImage" class="img-fluid rounded mb-3 d-none" alt="">
+                <div id="pvEvent" class="text-muted mb-3"></div>
+                <div id="pvBody" style="white-space:pre-wrap; line-height:1.6"></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <small class="text-muted"><i class="bi bi-person"></i> <span id="pvAuthor"></span></small>
+                <small class="text-muted"><i class="bi bi-clock"></i> <span id="pvDate"></span></small>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/feed.js" asp-append-version="true"></script>
+}

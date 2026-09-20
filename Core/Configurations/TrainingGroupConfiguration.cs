@@ -20,6 +20,7 @@ namespace Core.Configurations
 
             b.HasOne(g => g.Coach).WithMany(c => c.Groups)
                 .HasForeignKey(g => g.CoachId).OnDelete(DeleteBehavior.Restrict);
+            
 
             //конфигурация для уникальности имени — только среди неархивных (в новом сезоне «U-8» создаётся заново)
             b.HasIndex(g => g.Name).IsUnique().HasFilter("\"IsArchived\" = false AND \"IsDeleted\" = false");

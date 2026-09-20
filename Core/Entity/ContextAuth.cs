@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Core.Configurations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,10 +25,14 @@ namespace Core.Entity
         public DbSet<AbsenceNotice> AbsenceNotices=> Set<AbsenceNotice>();
         public DbSet<Attendance> Attendances => Set<Attendance>();
         public DbSet<Coach> Coaches => Set<Coach>();
-        
+        public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+        public DbSet<ChatReadMark> ChatReadMarks => Set<ChatReadMark>();        
         public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<ParentProfile> ParentProfiles => Set<ParentProfile>();
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Player> Players => Set<Player>();
+        public DbSet<Post> Posts => Set<Post>();
+        public DbSet<AppRole> Roles => Set<AppRole>();
         public DbSet<Skill> Skills => Set<Skill>();
         public DbSet<SkillAssessment> SkillAssessments => Set<SkillAssessment>();
         public DbSet<SkillScore> SkillScores => Set<SkillScore>();
@@ -35,6 +40,7 @@ namespace Core.Entity
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<TrainingPlan> TrainingPlans => Set<TrainingPlan>();
         public DbSet<TrainingGroup> Groups => Set<TrainingGroup>();
+        public DbSet<AppUser> Users => Set<AppUser>();        
         public DbSet<Venue> Venues => Set<Venue>();
 
 
@@ -42,6 +48,7 @@ namespace Core.Entity
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new PlayerConfiguration());
             //builder.Entity<Player>(entity =>
             //{
             //    entity.HasBaseType<AppUser>();
@@ -66,7 +73,7 @@ namespace Core.Entity
             builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
-            builder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
+            builder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");            
 
             // Настройка связей (опционально)
             builder.Entity<IdentityUserRole<Guid>>()
@@ -85,6 +92,7 @@ namespace Core.Entity
                 .HasIndex(r => r.NormalizedName)
                 .IsUnique();
 
+            
             builder.Entity<AppUser>().Property(u => u.FirstName).HasMaxLength(100);
             builder.Entity<AppUser>().Property(u => u.LastName).HasMaxLength(100);
             builder.Entity<AppRole>().Property(r => r.Description).HasMaxLength(500);

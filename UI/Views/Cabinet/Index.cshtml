@@ -8,6 +8,11 @@
 @{
     ViewData["Title"] = "Личный кабинет";
 }
+<style>
+    .card.plan.selected{
+        border: 1px solid gray;
+    }
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -48,7 +53,7 @@
                         <dd class="col-7 @(c.MedicalExpired ? "text-danger" : "")">
                             @(c.MedicalUntil?.ToString("dd.MM.yyyy") ?? "не загружена")
                         </dd>
-                        <dt class="col-5">Абонемент</dt>
+                        @* <dt class="col-5">Абонемент</dt> *@
                         @* <dd class="col-7">
                             @if (c.ActiveSubscriptionUntil is not null)
                             {

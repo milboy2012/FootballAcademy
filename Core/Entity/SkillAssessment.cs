@@ -16,6 +16,8 @@ namespace Core.Entity
         public DateOnly Date { get; set; }
         public string? Season { get; set; }              // "2026/2027" — берётся из группы на момент оценки
         public string? Comment { get; set; }
+        public Guid? TrainingId { get; set; }     // null = «контрольный срез» вне тренировки (старый сценарий)
+        public Training? Training { get; set; }
         public ICollection<SkillScore> Scores { get; set; } = [];
     }
 }

@@ -1,5 +1,10 @@
 ﻿(() => {
-    const ROLE_RU = { Admin: 'Администратор', Manager: 'Менеджер', Coach: 'Тренер', Parent: 'Родитель', Player: 'Игрок' };
+    const ROLE_RU = {        
+        Manager: 'Менеджер',
+        Coach: 'Тренер',
+        Parent: 'Родитель',
+        Player: 'Игрок'
+    };
     const fmtDate = d => d ? new Date(d).toLocaleDateString('ru-RU') : '';
     const json = (url, method, body) => fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
     const errorOf = async r => (await r.json().catch(() => null))?.error ?? `Ошибка ${r.status}`;
@@ -9,11 +14,12 @@
 
     // ---- роли в фильтр и селект карточки ----
     fetch('/api/users/roles').then(r => r.json()).then(roles => {
+        console.log(roles);
         for (const r of roles) { $('fRole').add(new Option(ROLE_RU[r] ?? r, r)); $('umRole').add(new Option(ROLE_RU[r] ?? r, r)); }
-        $('fRole').add(new Option(ROLE_RU.Admin, 'Admin'));
+        // $('fRole').add(new Option(ROLE_RU.Admin, 'Admin'));
     });
 
-    // ---- таблица ----
+    //---- таблица ----
     const table = new Tabulator('#usersTable', {
         layout: 'fitColumns',
         ajaxURL: '/api/users',

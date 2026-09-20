@@ -12,11 +12,16 @@ namespace Core.Interfaces
     {
         IRepo<AbsenceNotice> AbsenceNotices{ get; }        
         IRepo<Attendance> Attendances{ get; }        
+        IRepo<ChatMessage> ChatMessages { get; }        
+        IRepo<ChatReadMark> ChatReadMarks { get; }        
         IRepo<Coach> Coaches{ get; }
         IRepo<TrainingGroup> Groups { get; }
         IRepo<Notification> Notifications{ get; }
+        IRepo<ParentProfile> ParentProfiles{ get; }
         IRepo<Payment> Payments{ get; }
         IRepo<Player> Players { get; }
+        IRepo<Post> Posts{ get; }
+        IRepo<AppRole> Roles { get; }
         IRepo<Skill> Skills { get; }
         IRepo<SkillAssessment> SkillAssessments { get; }
         IRepo<SkillScore> SkillScores { get; }
@@ -24,6 +29,7 @@ namespace Core.Interfaces
         IRepo<Training> Trainings{ get; }        
         IRepo<TrainingPlan> TrainingPlans{ get; }        
         IRepo<Venue> Venues{ get; }
+        IRepo<AppUser> Users{ get; }        
 
         //IRepo<AppUser> Users{ get; }
         //IRepo<AppRole> Role{ get; }

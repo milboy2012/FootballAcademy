@@ -6,7 +6,8 @@
     const showError = m => { errBox.textContent = m; errBox.classList.remove('d-none'); };
     const reset = () => { form.reset(); form.classList.remove('was-validated'); errBox.classList.add('d-none'); };
 
-    const STATUS = { PendingPayment: ['ожидает оплаты', 'warning'], Active: ['активен', 'success'], Expired: ['истёк', 'secondary'], Frozen: ['заморожен', 'info'], Cancelled: ['отменён', 'danger'] };
+    //const STATUS = { PendingPayment: ['ожидает оплаты', 'warning'], Active: ['активен', 'success'], Expired: ['истёк', 'secondary'], Frozen: ['заморожен', 'info'], Cancelled: ['отменён', 'danger'] };
+    const STATUS = { 0: ['ожидает оплаты', 'warning'], 1: ['активен', 'success'], 2: ['истёк', 'secondary'], 3: ['заморожен', 'info'], 4: ['отменён', 'danger'] };
     const subModal = new bootstrap.Modal('#subModal'); let subPlayer = null, plans = [], chosenPlan = null, pendingId = null;
 
     document.getElementById('btnAdd').addEventListener('click', () => {
@@ -84,8 +85,8 @@
         chooseBox.classList.toggle('d-none', !!pendingId);
         var pl = document.getElementById('plans');
         pl.innerHTML = plans.map(p =>
-            `<div class="col-md-3">
-                <div class="card plan h-100" data-plan="${p.id}" style="cursor:pointer">
+            `<div class="col-md-3 head-card">
+                <div class="card plan h-100" data-plan="${p.id}" style="cursor:pointer ">
                     <div class="card-body text-center">
                         <div class="fw-bold">${p.name}</div>
                         <div class="fs-4">${p.price.toLocaleString('ru-RU')} ₽</div>
@@ -96,14 +97,24 @@
             </div>`)
             .join('');
 
-        document.querySelectorAll('.plan').forEach(c => c.addEventListener('click', () => {
-            document.querySelectorAll('.plan').forEach(x => x.classList.remove('border-primary', 'border-2'));
-            c.classList.add('border-primary', 'border-2');
-            chosenPlan = c.dataset.plan;
+        // document.querySelectorAll('.plan').forEach(c => c.addEventListener('click', () => {
+        //     document.querySelectorAll('.plan').forEach(x => x.classList.remove('border-primary', 'border-2'));
+        //     c.classList.add('border-primary', 'border-2');
+        //     chosenPlan = c.dataset.plan;
 
-            var btnRequest = document.getElementById('btnRequest');
-            btnRequest.disabled = false;
-        }));
+        //     var btnRequest = document.getElementById('btnRequest');
+        //     btnRequest.disabled = false;
+        // }));
+
+        pl.addEventListener('click', e=> {
+            var card = e.target.closest('.plan');
+            if(!card) return;
+
+            pl.querySelectorAll('.plan.selected').forEach(x=>x.classList.remove('selected'));
+            card.classList.add('selected');
+            chosenPlan = card.dataset.plan;
+            document.getElementById('btnRequest').disabled = false;
+        });
 
         // $('subFrom').value = ''; 
         // $('subComment').value = ''; 

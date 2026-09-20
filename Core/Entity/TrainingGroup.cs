@@ -26,5 +26,6 @@ namespace Core.Entity
         public ICollection<Player> Players { get; set; } = [];
         [InverseProperty(nameof(Training.Group))]
         public ICollection<Training> Trainings { get; set; } = [];
+        public ICollection<Post> Posts { get; set; } = [];
     }
 }

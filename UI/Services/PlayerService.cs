@@ -127,7 +127,8 @@ namespace UI.Services
                 0,
                 player.Group?.Name,
                 player.GroupId,
-                player.Parent.LastName + " " + player.Parent.FirstName,
+                //player.Parent.LastName + " " + player.Parent.FirstName,
+                "не добавляет ФИО родителя(разобраться)",
                 player.ParentId,
                 player.MedicalCertificateUntil,
                 player.IsActive);

@@ -1,6 +1,6 @@
 ﻿<!-- Views/Account/AccessDenied.cshtml -->
 @{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = "Нет доступа";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -12,15 +12,15 @@
                     <div class="mb-4">
                         <i class="fas fa-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
                     </div>
-                    <h2 class="text-danger mb-3">Access Denied</h2>
-                    <p class="lead">You do not have permission to access this page.</p>
-                    <p class="text-muted">Please contact your administrator if you believe this is a mistake.</p>
+                    <h2 class="text-danger mb-3">Отказано в доступе</h2>
+                    <p class="lead">У Вас нет прав доступа к этой странице.</p>
+                    <p class="text-muted">Пожалуйста сообщите администратору если в будущем будете получать такое сообщение.</p>
                     <hr />
                     <a asp-action="Login" asp-controller="Account" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                        <i class="fas fa-sign-in-alt"></i> Авторизация
                     </a>
                     <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary ms-2">
-                        <i class="fas fa-home"></i> Home
+                        <i class="fas fa-home"></i> Главная
                     </a>
                 </div>
             </div>

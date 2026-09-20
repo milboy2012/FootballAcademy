@@ -1,0 +1,142 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var isStaff = User.IsInRole("Manager") || User.IsInRole("Coach");
+    var canEdit = User.IsInRole("Manager");
+    ViewData["Title"] = "Публикации";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Публикации</h2>
+    @if (isStaff)
+    {
+        <button class="btn btn-primary" id="btnAdd"><i class="bi bi-plus-lg"></i> Добавить</button>
+    }
+</div>
+
+<div id="postsTable"></div>
+
+@if (isStaff)
+{
+    @* <div class="modal fade" id="postModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" id="postForm" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить(изменить) публикацию</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" />
+                    <div class="row g-2">
+                        <div class="col-6"><label class="form-label">Тип *</label><select name="type" class="form-select" required></select></div>
+                        <div class="col-6"><label class="form-label">Заголовок *</label><input name="title" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Текст публикации *</label><input name="body" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Дата *</label><input name="eventDate" type="date" class="form-control" required /></div>
+                        <div class="col-6"><label class="form-label">Место проведения</label><input name="location" class="form-control" /></div>
+                        <div class="col-6"><label class="form-label">Доступ *</label><select name="audience" class="form-select" required></select></div>
+
+                        <div class="col-12 form-check ms-2">
+                            <input name="isPinned" type="checkbox" class="form-check-input" id="pinnedActive" />
+                            <label class="form-check-label" for="pinnedActive">Закреплен</label>
+                        </div>
+
+                        <div class="col-12 form-check ms-2">
+                            <input name="isPublished" type="checkbox" class="form-check-input" id="publishedActive" />
+                            <label class="form-check-label" for="publishedActive">Опубликован</label>
+                        </div>
+
+                        <div class="col-6"><label class="form-label">Группа</label><select name="group" class="form-select"></select></div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" name ="notify" type="checkbox" id="notifyOn" checked />
+                            <label class="form-check-label" for="notifyOn">Уведомить участников</label>
+                        </div>
+
+                    </div>
+                    <div class="alert alert-danger mt-3 d-none" id="formError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div> *@
+
+    <div class="modal fade" id="postModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <form class="modal-content" id="postForm" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить(изменить) публикацию</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" />
+                    <div class="alert alert-danger d-none mb-3" id="formError"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Тип *</label>
+                            <select name="type" class="form-select" required></select>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">Заголовок *</label>
+                            <input name="title" class="form-control" required maxlength="200" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label d-flex justify-content-between">
+                                <span>Текст публикации *</span>
+                                <small class="text-muted"><span id="bodyCounter">0</span> символов</small>
+                            </label>
+                            <textarea name="body" class="form-control" rows="14"
+                                      style="min-height:300px; resize:vertical" required></textarea>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Дата и время *</label>
+                            <input name="eventDate" type="datetime-local" class="form-control" required />
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Место проведения</label>
+                            <input name="location" class="form-control" maxlength="200" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Доступ *</label>
+                            <select name="audience" class="form-select" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Группа</label>
+                            <select name="group" class="form-select"></select>
+                        </div>
+
+                        <div class="col-12 d-flex flex-wrap gap-4 pt-2">
+                            <div class="form-check form-switch">
+                                <input name="isPinned" type="checkbox" class="form-check-input" id="pinnedActive" />
+                                <label class="form-check-label" for="pinnedActive">Закреплен</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input name="isPublished" type="checkbox" class="form-check-input" id="publishedActive" />
+                                <label class="form-check-label" for="publishedActive">Опубликован</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" name="notify" type="checkbox" id="notifyOn" checked />
+                                <label class="form-check-label" for="notifyOn">Уведомить участников</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {       
+    <script>window.schedulePage = { canEdit: @canEdit.ToString().ToLower() };</script>
+    <script src="~/js/post.js" asp-append-version="true"></script>
+}

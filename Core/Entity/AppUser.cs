@@ -18,8 +18,16 @@ namespace Core.Entity
         // Временный пароль: при входе требуется смена.
         public bool MustChangePassword { get; set; }
 
+        public string? MiddleName { get; set; }
+        public DateOnly? BirthDate { get; set; }
+        public string? AvatarPath { get; set; }          // /uploads/avatars/{id}.jpg
+        public string? About { get; set; }
+        public string? City { get; set; }
+        public bool NotifyByEmail { get; set; } = true;
+
 
         // Навигационные свойства
+        public virtual ICollection<Post> Posts{ get; set; }
         //public virtual ICollection<Player> Players { get; set; }
         //public virtual ICollection<AppRole> UserRoles { get; set; }
     }

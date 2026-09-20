@@ -1,0 +1,97 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Мой профиль";
+}
+<h2 class="mb-3">Мой профиль</h2>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="position-relative d-inline-block">
+                    <img id="avatar" class="rounded-circle border" style="width:140px;height:140px;object-fit:cover" alt="" />
+                    <div id="avatarPlaceholder" class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold fs-1 bg-primary" style="width:140px;height:140px"></div>
+                </div>
+                <h5 class="mt-3 mb-0" id="pName"></h5>
+                <div class="text-muted small" id="pRole"></div>
+                <div class="text-muted small" id="pSince"></div>
+                <div class="mt-3">
+                    <label class="btn btn-sm btn-outline-primary">Загрузить фото <input type="file" id="avatarFile" accept="image/*" hidden /></label>
+                    <button class="btn btn-sm btn-outline-secondary" id="btnRemoveAvatar">Убрать</button>
+                </div>
+                <div class="form-text">JPG/PNG/WEBP до 2 МБ</div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><strong>Смена пароля</strong></div>
+            <form class="card-body" id="pwdForm" novalidate>
+                <input name="current" type="password" class="form-control mb-2" placeholder="Текущий пароль" required autocomplete="current-password" />
+                <input name="next" type="password" class="form-control mb-2" placeholder="Новый пароль" required minlength="6" autocomplete="new-password" />
+                <input name="confirm" type="password" class="form-control mb-2" placeholder="Повторите новый" required autocomplete="new-password" />
+                <button class="btn btn-outline-primary btn-sm w-100">Сменить пароль</button>
+                <div class="alert alert-danger mt-2 py-1 small d-none" id="pwdErr"></div>
+                <div class="alert alert-success mt-2 py-1 small d-none" id="pwdOk">Пароль изменён</div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <form id="profileForm" novalidate>
+            <div class="card mb-3">
+                <div class="card-header"><strong>Основные данные</strong></div>
+                <div class="card-body row g-2">
+                    <div class="col-md-4"><label class="form-label">Фамилия *</label><input name="lastName" class="form-control" required /></div>
+                    <div class="col-md-4"><label class="form-label">Имя *</label><input name="firstName" class="form-control" required /></div>
+                    <div class="col-md-4"><label class="form-label">Отчество</label><input name="middleName" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Email / логин</label><input id="pEmail" class="form-control" disabled /></div>
+                    <div class="col-md-6"><label class="form-label">Телефон</label><input name="phone" class="form-control" placeholder="+375 00 000-00-00" /></div>
+                    <div class="col-md-6"><label class="form-label">Дата рождения</label><input name="birthDate" type="date" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Город</label><input name="city" class="form-control" /></div>
+                    <div class="col-12"><label class="form-label">О себе</label><textarea name="about" class="form-control" rows="3" maxlength="1000"></textarea></div>
+                    <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" name="notifyByEmail" id="notifyByEmail" /><label class="form-check-label" for="notifyByEmail">Получать уведомления на email</label></div>
+                </div>
+            </div>
+
+            <div class="card mb-3 d-none" id="coachBlock">
+                <div class="card-header"><strong>Тренерская информация</strong> <small class="text-muted">— видна родителям</small></div>
+                <div class="card-body row g-2">
+                    <div class="col-md-8"><label class="form-label">Квалификация / лицензия</label><input name="coach.qualification" class="form-control" placeholder="UEFA C, тренер по футболу" /></div>
+                    <div class="col-md-4"><label class="form-label">Стаж, лет</label><input name="coach.experienceYears" type="number" min="0" max="60" class="form-control" /></div>
+                    <div class="col-12"><label class="form-label">Биография</label><textarea name="coach.bio" class="form-control" rows="3" maxlength="2000"></textarea></div>
+                    <div class="col-12"><label class="form-label">Достижения</label><textarea name="coach.achievements" class="form-control" rows="2" maxlength="1000"></textarea></div>
+                    <div class="col-12 text-muted small" id="coachRo"></div>
+                </div>
+            </div>
+
+            <div class="card mb-3 d-none" id="parentBlock">
+                <div class="card-header"><strong>Контакты для связи</strong> <small class="text-muted">— видны тренеру и менеджеру</small></div>
+                <div class="card-body row g-2">
+                    <div class="col-md-6"><label class="form-label">Дополнительный телефон</label><input name="parent.secondPhone" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Адрес</label><input name="parent.address" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Экстренный контакт (кто)</label><input name="parent.emergencyContactName" class="form-control" placeholder="Бабушка, Мария Ивановна" /></div>
+                    <div class="col-md-6"><label class="form-label">Экстренный контакт (телефон)</label><input name="parent.emergencyContactPhone" class="form-control" /></div>
+                    <div class="col-12"><label class="form-label">Примечания</label><textarea name="parent.notes" class="form-control" rows="2" maxlength="500" placeholder="Кто может забирать ребёнка, пожелания…"></textarea></div>
+                </div>
+            </div>
+
+            <div class="card mb-3 d-none" id="playerBlock">
+                <div class="card-header"><strong>Моя академия</strong></div>
+                <div class="card-body">
+                    <dl class="row mb-0" id="playerRo"></dl>
+                    <div class="form-text">Имя, фамилию и дату рождения меняют родители в своём кабинете.</div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger d-none" id="err"></div>
+            <div class="alert alert-success d-none" id="ok">Профиль сохранён</div>
+            <button class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/profile.js" asp-append-version="true"></script>
+}

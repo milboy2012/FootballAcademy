@@ -2,7 +2,7 @@
 <!-- Views/Account/Login.cshtml -->
 @model LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Авторизация";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -11,7 +11,7 @@
         <div class="col-md-6 col-lg-5">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center py-3">
-                    <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Login</h4>
+                    <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i>Регистрационные данные</h4>
                 </div>
                 <div class="card-body p-4">
                     <form asp-action="Login" method="post" class="needs-validation" novalidate>
@@ -47,14 +47,14 @@
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt"></i> Login
+                                <i class="fas fa-sign-in-alt"></i> Вход
                             </button>
                         </div>
 
                         <div class="mt-3 text-center">
                             <p>
-                                Don't have an account? 
-                                <a asp-action="Register" class="text-primary fw-bold">Register here</a>
+                                Нет аккаунта? 
+                                <a asp-action="Register" class="text-primary fw-bold">Зарегистрируйся</a>
                             </p>
                         </div>
                     </form>
