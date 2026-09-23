@@ -135,7 +135,7 @@
             return `<tr>
                         <td>${h.planName}</td>
                         <td>${new Date(h.from).toLocaleDateString('ru-RU')} – ${new Date(h.to).toLocaleDateString('ru-RU')}</td>
-                        <td>${h.trainingsLimit == null ? '∞' : `${h.trainingsUsed}/${h.trainingsLimit}`}</td><td>${h.price.toLocaleString('ru-RU')} ₽</td>
+                        <td>${h.trainingsLimit == null ? '∞' : `${h.trainingsUsed}/${h.trainingsLimit}`}</td><td>${h.price.toLocaleString('ru-RU')} Br</td>
                         <td><span class="badge bg-${c}">${t}</span>${h.managerComment ? `<br><small class="text-muted">${h.managerComment}</small>` : ''}</td>
                     </tr>`;
         }).join('') || '<tr><td colspan="5" class="text-muted">Пока нет</td></tr>';

@@ -98,7 +98,8 @@
                 </div>
                 <div class="card-footer bg-transparent">
                     <a class="btn btn-sm btn-link px-0" asp-controller="Schedule" asp-action="Index" asp-route-playerId="@c.Id">Расписание</a>
-                    <a class="btn btn-sm btn-link" asp-controller="Payments" asp-action="Index" asp-route-playerId="@c.Id">Оплата</a>
+                    
+                    <a class="btn btn-sm btn-link" asp-controller="Parent" asp-action="Progress" asp-route-id="@c.Id">Результаты</a>
                 </div>
             </div>
         </div>

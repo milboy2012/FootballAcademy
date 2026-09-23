@@ -31,7 +31,7 @@ namespace UI.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user is null) return Challenge();
 
-            var us = await _data.Players.Query().Where(s=>s.ParentId == user.Id).ToListAsync();            
+            var us = await _data.Players.Query().Include(s=>s.User).Where(s=>s.ParentId == user.Id).ToListAsync();            
             var uss = await _data.Users.Query().Where(s => s.Id == user.Id).FirstOrDefaultAsync();
             
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -63,15 +63,36 @@ namespace UI.Controllers
                 AppUser coach = new AppUser();
                 if (p.GroupId != null)
                 {
-                    group = await _data.Groups.GetByIdAsync(p.GroupId, ct);
+                    group = await _data.Groups.Query().Include(s => s.Coach).FirstOrDefaultAsync(s=>s.Id == p.GroupId, ct);
+                    
                     if(group != null)
                     {
-                        c = await _data.Coaches.Query().FirstOrDefaultAsync(s=>s.Id == group.CoachId);
-                        coach = await _data.Users.Query().FirstOrDefaultAsync(s => s.Id == c.UserId);
+                        c = await _data.Coaches.Query().Include(s=>s.User).FirstOrDefaultAsync(s=>s.Id == group.CoachId);
+                        //p.Group = group;
+                        //coach = await _data.Users.Query().FirstOrDefaultAsync(s => s.Id == c.UserId);
                     }
                         
                 }
-                
+
+                DateTime? dt = null; 
+                if(p.GroupId != null)
+                {
+                    var trng = await _data.Trainings.Query()
+                        .Where(t => t.GroupId == p.GroupId && t.StartsAt >= DateTime.UtcNow  && t.Status == TrainingStatus.Planned)
+                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
+                        .FirstOrDefaultAsync();
+
+                    var actTrng = await _data.Trainings.Query()
+                        .Where(t => t.GroupId == p.GroupId && (t.EndsAt > DateTime.UtcNow && t.StartsAt < DateTime.UtcNow))
+                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
+                        .FirstOrDefaultAsync();
+
+                    if (trng != null)
+                        dt = trng;
+
+                    if (actTrng != null)
+                        dt = actTrng;
+                }
 
                 children.Add(new ChildCardVm
                 {
@@ -81,7 +102,7 @@ namespace UI.Controllers
                     //GroupName = p.Group != null ? p.Group.Name : null,                    
                     //CoachName = p.Group != null ? p.Group.Coach.User.LastName + " " + p.Group.Coach.User.FirstName : null,
                     GroupName = group != null ?  group.Name : null,
-                    CoachName = coach != null ? coach.LastName + " " + coach.FirstName : null,
+                    CoachName = c.User != null ? c.User.LastName + " " + c.User.FirstName : null,
                     MedicalUntil = p.MedicalCertificateUntil,
                     IsActive = p.IsActive,
                     Login = p.User != null ? p.User.UserName : null,
@@ -91,12 +112,14 @@ namespace UI.Controllers
                     //    .OrderByDescending(s => s.To).Select(s => (DateOnly?)s.To).FirstOrDefault(),
                     Subscription = new SubscriptionStatusDto(subscriptionStatus.IsValid, subscriptionStatus.Text, subscriptionStatus.Status, subscriptionStatus.To, subscriptionStatus.TrainingsLeft, subscriptionStatus.HasPending),
                     //Subscription = new SubscriptionStatusDto(false, "нет подписки", SubscriptionStatus.Expired, null,null,false),
-                    NextTraining = p.GroupId != null
-                    ? _data.Trainings.Query()
-                        .Where(t => t.GroupId == p.GroupId && t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
-                        .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
-                        .FirstOrDefault()
-                    : null
+                    //NextTraining = p.GroupId != null
+                    //? _data.Trainings.Query()
+                    //    .Where(t => t.GroupId == p.GroupId && t.StartsAt >= DateTime.UtcNow && t.Status == TrainingStatus.Planned)
+                    //    .OrderBy(t => t.StartsAt).Select(t => (DateTime?)t.StartsAt)
+                    //    .FirstOrDefault()
+                    //: null
+
+                    NextTraining = dt,
                 });
             }
                 

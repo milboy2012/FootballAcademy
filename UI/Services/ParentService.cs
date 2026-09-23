@@ -93,12 +93,13 @@ namespace UI.Services
 
         public async Task<ProgressDto> GetProgressAsync(Guid playerId, string? season, CancellationToken ct)
         {
-            var player = _data.Players.GetByIdAsync(playerId);
-            
+            //var player = _data.Players.GetByIdAsync(playerId);
+
+            var player = await _data.Players.Query().Include(s => s.Group).FirstOrDefaultAsync(s => s.Id == playerId);
             var skills = await _data.Skills.Query().AsNoTracking().Where(s => s.IsActive).OrderBy(s => s.SortOrder)
                 .Select(s => new SkillDto(s.Id, s.Name, s.Description)).ToListAsync(ct);
 
-            var q = _data.SkillAssessments.Query().AsNoTracking().Where(a => a.PlayerId == playerId);
+            var q = _data.SkillAssessments.Query().Include(s=>s.Scores).AsNoTracking().Where(a => a.PlayerId == playerId);
             season ??= await _data.Players.Query().Where(p => p.Id == playerId).Select(p => p.Group != null ? p.Group.Season : null).FirstOrDefaultAsync(ct);
             if (season is not null) q = q.Where(a => a.Season == season);
 
@@ -108,12 +109,20 @@ namespace UI.Services
                 var dd = q.OrderBy(a => a.Date).ToList();
                 foreach(var it in dd)
                 {
-                    Coach coach = await _data.Coaches.GetByIdAsync(it.CoachId);
-                    AppUser user = await _data.Users.GetByIdAsync(coach.UserId);
-                    AssessmentDto add = new AssessmentDto(it.Id, it.Date, (user.LastName + user.FirstName), it.Comment, new Dictionary<Guid, int>());
-                        
+                    if(player.Group != null)
+                    {
+                        Coach coach = await _data.Coaches.Query().Include(s => s.User).FirstOrDefaultAsync();
+                        //AppUser user = await _data.Users.GetByIdAsync(coach.UserId);
+                        Dictionary<Guid, int> dict = new Dictionary<Guid, int>();
+                        foreach(var sc in it.Scores)
+                        {
+                            dict.Add(sc.SkillId, sc.Value);
+                        }
+                        AssessmentDto add = new AssessmentDto(it.Id, it.Date, (coach.User.LastName + coach.User.FirstName), it.Comment, dict);
+
+                        list.Add(add);
+                    }
                     
-                    list.Add(add);
                 }
                 //.Select(a => new AssessmentDto(a.Id, a.Date, a.Coach.User.LastName + " " + a.Coach.User.FirstName, a.Comment,
                 //    a.Scores.ToDictionary(s => s.SkillId, s => s.Value)))
